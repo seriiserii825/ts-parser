@@ -1,6 +1,5 @@
 import { select } from "@clack/prompts";
-
-type TOption = { label: string; value: string };
+import { TOption } from "../types/TOption.js";
 
 export default async function chalkSelect<T extends { message: string; options: Array<TOption> }>(
   data: T

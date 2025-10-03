@@ -1,13 +1,14 @@
 import chalk from "chalk";
 import chalkSelect from "../utils/chalkSelect.js";
 import UrlsManager from "./getDomain.js";
+import {TOption} from "../types/TOption.js";
 
 export default async function mainMenu(): Promise<string | undefined> {
   await UrlsManager.ensureUrlsFile();
 
   while (true) {
     const message = "Меню";
-    const options = [
+    const options: TOption[] = [
       { label: "Просмотреть", value: "list" },
       { label: "Выбрать", value: "select" },
       { label: "Добавить", value: "add" },
