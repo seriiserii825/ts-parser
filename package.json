@@ -1,17 +1,25 @@
 {
-  "name": "ts-parser",
+  "name": "urls-cli-ts",
   "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "description": "CLI на TypeScript для CRUD по urls.txt в текущей папке",
+  "type": "module",
+  "bin": {
+    "urls": "./dist/index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
   "dependencies": {
-    "chalk": "^5.6.2",
+    "chalk": "^5.3.0",
     "enquirer": "^2.4.1",
-    "fs-extra": "^11.3.2"
+    "fs-extra": "^11.2.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^22.7.5",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3"
   }
 }
