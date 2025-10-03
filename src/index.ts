@@ -1,8 +1,11 @@
 #!/usr/bin/env node
+
 import path from "node:path";
 import fs from "fs-extra";
 import chalk from "chalk";
-import { prompt } from "enquirer";
+// import { prompt } from "enquirer";
+import pkg from 'enquirer';
+const { prompt } = pkg;
 
 // ---------- Константы ----------
 const FILE_NAME = "urls.txt";
