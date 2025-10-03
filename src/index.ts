@@ -2,4 +2,5 @@
 
 import mainMenu from "./modules/mainMenu.js";
 
+
 mainMenu();
