@@ -5,6 +5,8 @@ import chalk from "chalk";
 import pkg from "enquirer";
 import chalkSelect from "../utils/chalkSelect.js";
 import chalkMultiSelect from "../utils/chalkMultiSelect.js";
+import chalkInput from "../utils/chalkInput.js";
+import ClipboardManager from "../utils/clipboardManager.js";
 
 const { prompt } = pkg;
 
@@ -82,17 +84,41 @@ async function selectUrl(): Promise<string> {
 }
 
 async function addUrl(): Promise<void> {
-  const { url } = await prompt<{ url: string }>({
-    type: "input",
-    name: "url",
-    message: "Введите URL (http/https)",
-    validate: (val: string) => (isValidHTTPUrl(val) ? true : "Нужен корректный http(s) URL"),
+  const input = await chalkInput({
+    message: "Ввести url или вставить из буфера обмена, y/n?: ",
+    placeholder: "",
+    initialValue: "",
+    validate: (value) => {
+      if (value !== "y" && value !== "n") {
+        return "Введите 'y' или 'n'";
+      }
+    },
   });
 
-  const urls = await readUrls();
-  urls.push(url.trim());
-  await writeUrls(urls);
-  console.log(chalk.green("Добавлено!"));
+  if (input === "y") {
+    const clipboard = await ClipboardManager.read();
+    if (isValidHTTPUrl(clipboard)) {
+      const urls = await readUrls();
+      urls.push(clipboard.trim());
+      await writeUrls(urls);
+      console.log(chalk.green("Добавлено!"));
+      await listUrls();
+    } else {
+      console.log(chalk.red("Буфер обмена не содержит корректный http(s) URL."));
+    }
+  } else {
+    const url = await chalkInput({
+      message: "Введите URL (http/https): ",
+      placeholder: "https://example.com",
+      initialValue: "http",
+      validate: (value) => (isValidHTTPUrl(value) ? "" : "Нужен корректный http(s) URL"),
+    });
+    const urls = await readUrls();
+    urls.push(url.trim());
+    await writeUrls(urls);
+    console.log(chalk.green("Добавлено!"));
+    await listUrls();
+  }
 }
 
 async function editUrl(): Promise<void> {
