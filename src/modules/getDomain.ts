@@ -128,24 +128,23 @@ async function editUrl(): Promise<void> {
     return;
   }
 
-  const { index } = await prompt<{ index: number }>({
-    type: "select",
-    name: "index",
-    message: "Выберите ссылку для редактирования",
-    choices: urls.map((u, i) => ({ name: String(i), message: u, value: i })),
+  const index = await chalkSelect({
+    message: "Выберите URL для редактирования",
+    options: urls.map((u, i) => ({ label: u, value: String(i) })),
   });
 
-  const oldVal = urls[index];
+  const numberIndex = Number(index);
 
-  const { updated } = await prompt<{ updated: string }>({
-    type: "input",
-    name: "updated",
-    message: "Новый URL",
-    initial: oldVal,
-    validate: (val: string) => (isValidHTTPUrl(val) ? true : "Нужен корректный http(s) URL"),
+  const oldVal = urls[numberIndex];
+
+  const updated = await chalkInput({
+    message: "Отредактируйте URL:",
+    placeholder: oldVal,
+    initialValue: oldVal,
+    validate: (value) => (isValidHTTPUrl(value) ? "" : "Нужен корректный http(s) URL"),
   });
 
-  urls[index] = updated.trim();
+  urls[numberIndex] = updated.trim();
   await writeUrls(urls);
   console.log(chalk.green("Обновлено!"));
 }
