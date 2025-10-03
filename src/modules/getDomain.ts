@@ -3,6 +3,8 @@ import fs from "fs-extra";
 import chalk from "chalk";
 // import { prompt } from "enquirer";
 import pkg from "enquirer";
+import chalkSelect from "../utils/chalkSelect.js";
+import chalkMultiSelect from "../utils/chalkMultiSelect.js";
 
 const { prompt } = pkg;
 
@@ -67,6 +69,18 @@ async function listUrls(): Promise<void> {
   }
 }
 
+async function selectUrl(): Promise<string> {
+  const urls = await readUrls();
+  if (urls.length === 0) {
+    console.log(chalk.yellow("Файл пуст. Добавьте первую ссылку."));
+  } else {
+    console.log(chalk.cyan(`\nСодержимое ${FILE_NAME}:`));
+    urls.forEach((u, i) => {
+      console.log(chalk.gray(String(i + 1).padStart(2, " ")), u);
+    });
+  }
+}
+
 async function addUrl(): Promise<void> {
   const { url } = await prompt<{ url: string }>({
     type: "input",
@@ -117,23 +131,15 @@ async function removeUrls(): Promise<void> {
     return;
   }
 
-  const { toRemove } = await prompt<{ toRemove: number[] }>({
-    type: "multiselect",
-    name: "toRemove",
-    message: "Выберите ссылки для удаления (пробел — выбрать, Enter — подтвердить)",
-    choices: urls.map((u, i) => ({ name: String(i), message: u, value: i })),
-    // можно убрать required, чтобы позволить пустой выбор
-    required: false as any,
-  });
+  const message = "Выберите файл для удаления";
+  const options = urls.map((u, i) => ({ label: u, value: String(i) }));
+  const indexes = await chalkMultiSelect({ message, options });
 
-  if (!toRemove || toRemove.length === 0) {
-    console.log(chalk.gray("Ничего не выбрано."));
-    return;
-  }
-
+  const toRemove = indexes.map((s) => Number(s));
   const keep = urls.filter((_, i) => !toRemove.includes(i));
   await writeUrls(keep);
   console.log(chalk.green(`Удалено: ${toRemove.length}`));
+  await listUrls();
 }
 
 async function clearFile(): Promise<void> {
@@ -160,5 +166,5 @@ export {
   editUrl,
   removeUrls,
   clearFile,
-  FILE_NAME
-}
+  FILE_NAME,
+};

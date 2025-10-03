@@ -1,22 +1,21 @@
 import { addUrl, clearFile, editUrl, ensureUrlsFile, listUrls, removeUrls } from "./getDomain.js";
 import chalk from "chalk";
-import { select } from "@clack/prompts";
+import chalkSelect from "../utils/chalkSelect.js";
 
 export default async function mainMenu(): Promise<void> {
   await ensureUrlsFile();
 
   while (true) {
-    const action = await select({
-      message: "Меню",
-      options: [
-        { label: "Просмотреть", value: "list" },
-        { label: "Добавить", value: "add" },
-        { label: "Редактировать", value: "edit" },
-        { label: "Удалить", value: "remove" },
-        { label: "Очистить", value: "clear" },
-        { label: "Выход", value: "exit" },
-      ],
-    });
+    const message = "Меню";
+    const options = [
+      { label: "Просмотреть", value: "list" },
+      { label: "Добавить", value: "add" },
+      { label: "Редактировать", value: "edit" },
+      { label: "Удалить", value: "remove" },
+      { label: "Очистить", value: "clear" },
+      { label: "Выход", value: "exit" },
+    ];
+    const action = await chalkSelect({ message, options });
 
     try {
       if (action === "list") await listUrls();
