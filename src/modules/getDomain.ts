@@ -75,11 +75,17 @@ async function selectUrl(): Promise<string> {
   const urls = await readUrls();
   if (urls.length === 0) {
     console.log(chalk.yellow("Файл пуст. Добавьте первую ссылку."));
+    return "";
   } else {
     console.log(chalk.cyan(`\nСодержимое ${FILE_NAME}:`));
     urls.forEach((u, i) => {
       console.log(chalk.gray(String(i + 1).padStart(2, " ")), u);
     });
+    const index = await chalkSelect({
+      message: "Выберите URL",
+      options: urls.map((u, i) => ({ label: u, value: String(i) })),
+    });
+    return urls[Number(index)];
   }
 }
 
@@ -186,6 +192,7 @@ export {
   ensureUrlsFile,
   readUrls,
   writeUrls,
+  selectUrl,
   listUrls,
   addUrl,
   editUrl,

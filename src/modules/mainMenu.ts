@@ -1,14 +1,15 @@
-import { addUrl, clearFile, editUrl, ensureUrlsFile, listUrls, removeUrls } from "./getDomain.js";
+import { addUrl, clearFile, editUrl, ensureUrlsFile, listUrls, removeUrls, selectUrl } from "./getDomain.js";
 import chalk from "chalk";
 import chalkSelect from "../utils/chalkSelect.js";
 
-export default async function mainMenu(): Promise<void> {
+export default async function mainMenu(): Promise<string | undefined> {
   await ensureUrlsFile();
 
   while (true) {
     const message = "Меню";
     const options = [
       { label: "Просмотреть", value: "list" },
+      { label: "Выбрать", value: "select" },
       { label: "Добавить", value: "add" },
       { label: "Редактировать", value: "edit" },
       { label: "Удалить", value: "remove" },
@@ -19,6 +20,10 @@ export default async function mainMenu(): Promise<void> {
 
     try {
       if (action === "list") await listUrls();
+      else if (action === "select") {
+        const url = await selectUrl()
+        return url;
+      }
       else if (action === "add") {
         await addUrl();
         await listUrls();
