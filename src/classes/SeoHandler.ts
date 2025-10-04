@@ -1,5 +1,7 @@
 import chalk from "chalk";
 import { TSeoInfo } from "../types/THtmlResponse.js";
+import { ColumnOptionsRaw } from "console-table-printer/dist/src/models/external-table.js";
+import tablePrinter from "../utils/tablePrinter.js";
 
 type TSeoType = "title" | "description" | "og_image" | "robots";
 
@@ -42,41 +44,34 @@ export class SeoHandler {
 
   public seoTitle() {
     this.showTitle("Seo title:");
-    this.drawSeo(this.seo, "title");
+    this.printTable()
   }
   public seoDescription() {
     this.showTitle("Seo description:");
-    this.drawSeo(this.seo, "description");
+    this.printTable()
   }
   public seoOgImage() {
     this.showTitle("Seo og image:");
-    this.drawSeo(this.seo, "og_image");
+    this.printTable()
   }
   public seoRobots() {
     this.showTitle("Seo robots:");
-    this.drawSeo(this.seo, "robots");
+    this.printTable()
   }
 
-  private drawSeo(seo: TSeoInfo, type: TSeoType) {
-    if (type === "title") {
-      const title = seo.title ? `Title: "${seo.title}"` : "No title";
-      console.log(title);
-      return;
-    }
-    if (type === "description") {
-      const description = seo.description ? `Description: "${seo.description}"` : "No description";
-      console.log(description);
-      return;
-    }
-    if (type === "og_image") {
-      const og_image = seo.ogImage ? `OG Image: "${seo.ogImage}"` : "No OG image";
-      console.log(og_image);
-      return;
-    }
-    if (type === "robots") {
-      const robots = seo.robots ? `Robots: "${seo.robots}"` : "No robots";
-      console.log(robots);
-      return;
-    }
+  public printTable() {
+    const columns: ColumnOptionsRaw[] = [
+      { name: "Type", alignment: "left" },
+      { name: "Content", alignment: "left", maxLen: 100 },
+    ];
+
+    const rows = [
+      { Type: "Title", Content: this.seo.title || "N/A" },
+      { Type: "Description", Content: this.seo.description || "N/A" },
+      { Type: "Og Image", Content: this.seo.ogImage || "N/A" },
+      { Type: "Robots", Content: this.seo.robots || "N/A" },
+    ];
+
+    tablePrinter({ columns, rows });
   }
 }
