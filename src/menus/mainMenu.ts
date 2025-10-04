@@ -4,6 +4,8 @@ import seoMenu from "./seoMenu.js";
 import imageMenu from "./imageMenu.js";
 import htmlMenu from "./htmlMenu.js";
 import chalk from "chalk";
+import { seo_sub_menu_data, TSeoSubMenu } from "../data/seo_sub_menu_data.js";
+import chalkMultiSelect from "../utils/chalkMultiSelect.js";
 
 type Section = "seo" | "images" | "links" | "exit";
 
@@ -29,15 +31,10 @@ export default async function mainMenu(urls: string[]): Promise<void> {
     };
 
     if (section === "seo") {
-      menu_choices.seo = await htmlMenu([
-        { label: "All", value: "all" },
-        { label: "Title", value: "title" },
-        { label: "Description", value: "description" },
-        { label: "Og Image", value: "og_image" },
-        { label: "Robots", value: "robots" },
-        { label: "Back", value: "back" },
-        { label: "Exit", value: "exit" },
-      ]);
+      menu_choices.seo = await chalkMultiSelect({
+        message: "Select SEO options (use space to select multiple):",
+        options: seo_sub_menu_data,
+      }) as TSeoSubMenu[];
     }
 
     if (section === "images") {
@@ -49,7 +46,7 @@ export default async function mainMenu(urls: string[]): Promise<void> {
         { label: "Without loading attribute", value: "no-loading" },
         { label: "Back", value: "back" },
         { label: "Exit", value: "exit" },
-      ]); 
+      ]);
     }
 
     // прогоняем выбранное действие по всем URL
