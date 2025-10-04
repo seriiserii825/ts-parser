@@ -4,7 +4,7 @@ import { ImageHandler } from "../classes/ImageHandler.js";
 
 type ImageMenuResult = "back" | "exit";
 
-export default async function imageMenu(images: TImageInfo[]): Promise<ImageMenuResult> {
+export default async function imageMenu(images: TImageInfo[], all: boolean = false): Promise<ImageMenuResult> {
   const ih = new ImageHandler(images);
 
   while (true) {
