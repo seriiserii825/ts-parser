@@ -16,9 +16,8 @@ export type TLinkInfo = {
 
 export type TImageInfo = {
   url: string;
+  name: string;
   alt?: string;
-  width?: number;
-  height?: number;
   loading?: string;
   parent_class: string;
 };

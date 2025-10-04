@@ -107,11 +107,12 @@ export default class HtmlParse {
       const abs = UrlHelper.resolveImageUrl($img, this.baseUrl);
       if (!abs) return;
       const alt = $img.attr("alt")?.trim() || undefined;
+      const name = abs.split("/").pop() || abs;
       const width = Number($img.attr("width")) || undefined;
       const height = Number($img.attr("height")) || undefined;
       const loading = $img.attr("loading")?.trim() || undefined;
       const parent_class = this.findNearestParentClass($img) || "";
-      results.push({ url: abs, alt, width, height, loading, parent_class });
+      results.push({ url: abs, name, alt, width, height, loading, parent_class });
     });
 
     const seen = new Set<string>();
