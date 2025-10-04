@@ -3,6 +3,7 @@ import { select, confirm, isCancel } from "@clack/prompts";
 import HtmlParse from "./classes/HtmlParse.js";
 import mainMenu from "./modules/mainMenu.js";
 import imageMenu from "./menus/imageMenu.js";
+import seoMenu from "./menus/seoMenu.js";
 
 async function pause(msg = "Back") {
   await confirm({ message: msg, initialValue: true, active: "OK", inactive: "Cancel" });
@@ -36,9 +37,8 @@ async function run() {
 
       if (section === "seo") {
         const seo = await parser.getSeo();
-        console.log("SEO:", seo);
-        await pause();
-        continue;
+        const res = await seoMenu(seo);
+        if (res === "exit") return; // глобальный выход
       }
 
       if (section === "links") {
