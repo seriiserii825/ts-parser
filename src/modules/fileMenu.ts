@@ -3,7 +3,7 @@ import chalkSelect from "../utils/chalkSelect.js";
 import UrlsManager from "./getDomain.js";
 import {TOption} from "../types/TOption.js";
 
-export default async function mainMenu(): Promise<string | undefined> {
+export default async function fileMenu(): Promise<string | undefined> {
   await UrlsManager.ensureUrlsFile();
 
   while (true) {
