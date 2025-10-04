@@ -2,72 +2,75 @@ import { isCancel, select } from "@clack/prompts";
 import HtmlParse from "../classes/HtmlParse.js";
 import seoMenu from "./seoMenu.js";
 import imageMenu from "./imageMenu.js";
-import { html_menu_data, THtmlMenuValue } from "../data/html_menu_data.js";
+import htmlMenu from "./htmlMenu.js";
 
-type Section = THtmlMenuValue; // "seo" | "images" | "links" | "exit"
+type Section = "seo" | "images" | "links" | "exit";
 
-export default async function mainMenu(
-  url: string,
-  choices: readonly THtmlMenuValue[] = []
-): Promise<void> {
-  const parser = new HtmlParse(url);
+export default async function mainMenu(urls: string[]): Promise<void> {
+  // бесконечный цикл, чтобы после выполнения по всем ссылкам можно было выбрать новое действие
+  while (true) {
+    const section = (await select({
+      message: "What to extract (applies to ALL passed URLs)?",
+      options: [
+        { label: "SEO", value: "seo" },
+        { label: "Images", value: "images" },
+        { label: "Links", value: "links" },
+        { label: "Exit", value: "exit" },
+      ] as const,
+    })) as Section | symbol;
 
-    console.log(choices, "choices");
+    if (isCancel(section) || section === "exit") return;
 
-  const runSection = async (section: Section): Promise<"continue" | "exit"> => {
-    if (section === "exit") return "exit";
+    const menu_choices = {
+      seo: [] as string[],
+      images: [] as string[],
+      links: [] as string[],
+    }
 
     if (section === "seo") {
-      const seo = await parser.getSeo();
-      const res = await seoMenu(seo); // returns 'exit' | something
-      if (res === "exit") return "exit";
-      return "continue";
+      menu_choices.seo = await htmlMenu([
+        { label: "All", value: "all" },
+        { label: "Title", value: "title" },
+        { label: "Description", value: "description" },
+        { label: "Og Image", value: "og_image" },
+        { label: "Robots", value: "robots" },
+        { label: "Back", value: "back" },
+        { label: "Exit", value: "exit" },
+      ]);
     }
 
-    if (section === "links") {
-      const links = await parser.getAllLinks();
-      console.log("Links:", links);
-      return "continue";
+    // прогоняем выбранное действие по всем URL
+    for (const url of urls) {
+      const parser = new HtmlParse(url);
+      console.log(`\n— Processing: ${url}`);
+
+      if (section === "seo") {
+        const seo = await parser.getSeo();
+        const res = await seoMenu(seo, menu_choices.seo);
+        if (res === "exit") return;
+      }
+
+      if (section === "links") {
+        const links = await parser.getAllLinks();
+        console.log("Links:", links);
+      }
+
+      if (section === "images") {
+        const images = await parser.getAllImages();
+        const res = await imageMenu(images); // если внутри будет "exit" — выходим глобально
+        if (res === "exit") return;
+      }
     }
 
-    if (section === "images") {
-      const images = await parser.getAllImages();
-      const res = await imageMenu(images); // 'back' | 'exit'
-      if (res === "exit") return "exit";
-      return "continue";
-    }
+    // после прохода по всем ссылкам предложим выбрать следующее действие
+    const again = (await select({
+      message: "Run another action for ALL URLs?",
+      options: [
+        { label: "Yes", value: "again" },
+        { label: "Exit", value: "exit" },
+      ] as const,
+    })) as "again" | "exit" | symbol;
 
-    // на всякий
-    return "continue";
-  };
-
-  // 1) Непосредственное выполнение переданных choices (без интерактива)
-  if (choices.length > 0) {
-    // Опционально: фильтр от невалидных значений (на случай внешнего ввода)
-    const allowed = new Set<Section>([...html_menu_data.map((item) => item.value)]);
-    console.log("allowed", allowed);
-    for (const c of choices) {
-        console.log(c, "c");
-      if (!allowed.has(c)) continue;
-      const res = await runSection(c);
-      console.log("res", res);
-      if (res === "exit") return;
-    }
-    return; // всё выполнили — выходим
-  }
-
-  // 2) Интерактивный режим (циклом, пока не выберут exit / cancel)
-  while (true) {
-    const picked = await select({
-      message: `What to extract for ${url}?`,
-      options: html_menu_data, // [{ label, value }, ...] с value: THtmlMenuValue
-    });
-
-    if (isCancel(picked)) return;
-
-    const section = picked as Section;
-    const result = await runSection(section);
-    if (result === "exit") return;
-    // иначе — продолжаем цикл и снова показываем меню
+    if (isCancel(again) || again === "exit") return;
   }
 }

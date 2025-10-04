@@ -2,7 +2,6 @@ import chalk from "chalk";
 import XmlParse from "../classes/XmlParse.js";
 import chalkSelect from "../utils/chalkSelect.js";
 import chalkMultiSelect from "../utils/chalkMultiSelect.js";
-import { html_menu_data, THtmlMenuValue } from "../data/html_menu_data.js";
 import mainMenu from "./mainMenu.js";
 
 export default async function xmlMenu(url: string): Promise<void> {
@@ -14,16 +13,7 @@ export default async function xmlMenu(url: string): Promise<void> {
   const collection = await getCollectionFromLink(parser, choice);
   if (collection.length === 0) return;
   const links_to_parse = await getLinksToParse(collection);
-  console.log("links_to_parse", links_to_parse);
-  const isTHtmlMenuValue = (v: string): v is THtmlMenuValue =>
-    (["seo", "images", "links", "exit"] as const).includes(v as THtmlMenuValue);
-
-  const raw = await chalkMultiSelect({ message: "What to extract?", options: html_menu_data });
-
-  const sections = raw.filter(isTHtmlMenuValue) as readonly THtmlMenuValue[];
-  links_to_parse.forEach(async (link) => {
-    await mainMenu(link, sections);
-  });
+  await mainMenu(links_to_parse);
 }
 
 async function getSitemapLinks(parser: XmlParse, url: string): Promise<string[] | undefined> {

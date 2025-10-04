@@ -27,7 +27,7 @@ async function main() {
     return;
   }
   if (choice.includes("page")) {
-    await mainMenu(url);
+    await mainMenu([url]);
   }
   if (choice.includes("sitemap")) {
     await xmlMenu(url);
