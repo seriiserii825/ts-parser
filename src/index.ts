@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
 import chalk from "chalk";
-import htmlMenu from "./menus/htmlMenu.js";
 import fileMenu from "./modules/fileMenu.js";
 import mainMenu from "./menus/mainMenu.js";
+import xmlMenu from "./menus/xmlMenu.js";
+import chalkSelect from "./utils/chalkSelect.js";
 
 async function main() {
   const url = await fileMenu();
@@ -12,11 +13,15 @@ async function main() {
     return;
   }
 
-  const choice = await htmlMenu([
-    { label: "Home page", value: "page" },
-    { label: "Sitemap", value: "sitemap" },
-    { label: "Exit", value: "exit" },
-  ]);
+  const choice = await chalkSelect({
+    message: "You selected:",
+    options: [
+      { label: "Home page", value: "page" },
+      { label: "Sitemap", value: "sitemap" },
+      { label: "Exit", value: "exit" },
+    ],
+  });
+
   if (choice.includes("exit")) {
     console.log(chalk.red("Exiting..."));
     return;
@@ -25,7 +30,7 @@ async function main() {
     await mainMenu(url);
   }
   if (choice.includes("sitemap")) {
-    console.log(chalk.yellow("Sitemap feature is not implemented yet."));
+    await xmlMenu(url);
   }
 }
 
