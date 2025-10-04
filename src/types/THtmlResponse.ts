@@ -20,4 +20,5 @@ export type TImageInfo = {
   width?: number;
   height?: number;
   loading?: string;
+  parent_class: string;
 };

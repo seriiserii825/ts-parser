@@ -60,7 +60,9 @@ export class ImageHandler {
     const loading = img.loading ? ` loading="${img.loading}"` : "";
     const width = img.width ? ` width="${img.width}"` : "";
     const height = img.height ? ` height="${img.height}"` : "";
-    const image_html = `<img src="${img.url}" width="${width}" height="${height}"${alt}${loading}>`;
+    const image_html = `
+    class: "${img.parent_class}"
+    <img src="${img.url}" width="${width}" height="${height}"${alt}${loading}>`;
     console.log(image_html);
   }
 }

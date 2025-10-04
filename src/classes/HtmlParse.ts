@@ -1,3 +1,4 @@
+import type * as cheerio from "cheerio";
 import { load as loadHTML, CheerioAPI } from "cheerio";
 import { TImageInfo, TLinkInfo, TSeoInfo } from "../types/THtmlResponse.js";
 import { UrlHelper } from "../utils/UrlHelper.js";
@@ -109,7 +110,8 @@ export default class HtmlParse {
       const width = Number($img.attr("width")) || undefined;
       const height = Number($img.attr("height")) || undefined;
       const loading = $img.attr("loading")?.trim() || undefined;
-      results.push({ url: abs, alt, width, height, loading });
+      const parent_class = this.findNearestParentClass($img) || "";
+      results.push({ url: abs, alt, width, height, loading, parent_class });
     });
 
     const seen = new Set<string>();
@@ -118,5 +120,16 @@ export default class HtmlParse {
       seen.add(img.url);
       return true;
     });
+  }
+
+  private findNearestParentClass($el: cheerio.Cheerio<cheerio.Element>): string | null {
+    // Идём вверх по одному уровню за раз, чтобы гарантированно взять БЛИЖАЙШЕГО родителя с классом
+    let $p = $el.parent();
+    while ($p.length) {
+      const cls = $p.attr("class")?.trim();
+      if (cls) return cls; // нашли непустой class — возвращаем
+      $p = $p.parent(); // иначе поднимаемся ещё выше
+    }
+    return null; // до корня дошли — не нашли
   }
 }
