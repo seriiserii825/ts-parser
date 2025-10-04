@@ -5,7 +5,6 @@ import mainMenu from "./modules/mainMenu.js";
 import imageMenu from "./menus/imageMenu.js";
 import seoMenu from "./menus/seoMenu.js";
 
-
 async function pause(msg = "Back") {
   await confirm({ message: msg, initialValue: true, active: "OK", inactive: "Cancel" });
 }

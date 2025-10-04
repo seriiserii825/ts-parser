@@ -2,6 +2,7 @@ import chalk from "chalk";
 import { TSeoInfo } from "../types/THtmlResponse.js";
 import { ColumnOptionsRaw } from "console-table-printer/dist/src/models/external-table.js";
 import tablePrinter from "../utils/tablePrinter.js";
+import table3 from "../utils/table3.js";
 
 type TSeoType = "title" | "description" | "og_image" | "robots";
 
@@ -44,34 +45,48 @@ export class SeoHandler {
 
   public seoTitle() {
     this.showTitle("Seo title:");
-    this.printTable()
+    this.printTable('title');
   }
   public seoDescription() {
     this.showTitle("Seo description:");
-    this.printTable()
+    this.printTable('description');
   }
   public seoOgImage() {
     this.showTitle("Seo og image:");
-    this.printTable()
+    this.printTable('og_image');
   }
   public seoRobots() {
     this.showTitle("Seo robots:");
-    this.printTable()
+    this.printTable('robots');
   }
 
-  public printTable() {
-    const columns: ColumnOptionsRaw[] = [
-      { name: "Type", alignment: "left" },
-      { name: "Content", alignment: "left", maxLen: 100 },
-    ];
+  public printTable(type?: "title" | "description" | "og_image" | "robots") {
+    // маппинг твоих псевдонимов на реальные ключи в TSeoInfo
+    const map: Record<NonNullable<typeof type>, keyof TSeoInfo> = {
+      title: "title",
+      description: "description",
+      og_image: "ogImage",
+      robots: "robots",
+    };
 
-    const rows = [
-      { Type: "Title", Content: this.seo.title || "N/A" },
-      { Type: "Description", Content: this.seo.description || "N/A" },
-      { Type: "Og Image", Content: this.seo.ogImage || "N/A" },
-      { Type: "Robots", Content: this.seo.robots || "N/A" },
-    ];
+    const row = this.seo;
+    if (!type) {
+      console.log(
+        table3([row], ["title", "description", "ogImage", "robots"] as const, {
+          head: ["Title", "Description", "OG Image", "Robots"] as const,
+          colWidths: [40, 40, 40, 20] as const,
+        })
+      );
+      return;
+    }
 
-    tablePrinter({ columns, rows });
+    // печать одной колонки
+    const key = map[type];
+    console.log(
+      table3([row], [key] as const, {
+        head: [type.toUpperCase()] as const,
+        colWidths: [60] as const,
+      })
+    );
   }
 }
