@@ -1,6 +1,5 @@
 import chalk from "chalk";
 import { TImageInfo } from "../types/THtmlResponse.js";
-import table3 from "../utils/table3.js";
 
 export class ImageHandler {
   private images: TImageInfo[];
@@ -21,55 +20,39 @@ export class ImageHandler {
   public all() {
     this.showTitle("All images:");
     this.emptyData(this.images, "No images found.");
-    this.printTable();
+    this.drawImagesHtml(this.images)
   }
 
   public emptyAlt() {
     this.showTitle("Images with empty alt attribute:");
     const filtered = this.images.filter((img) => !img.alt || img.alt.trim() === "");
     this.emptyData(filtered, "No images with empty alt attribute found.");
-    this.printTable(filtered);
+    this.drawImagesHtml(filtered)
   }
   public withAlt() {
     this.showTitle("Images with filled alt attribute:");
     const filtered = this.images.filter((img) => img.alt && img.alt.trim() !== "");
     this.emptyData(filtered, "No images with filled alt attribute found.");
-    this.printTable(filtered);
+    this.drawImagesHtml(filtered)
   }
   public withLazyLoading() {
     this.showTitle('Images with loading="lazy":');
     const filtered = this.images.filter((img) => img.loading?.toLowerCase() === "lazy");
     this.emptyData(filtered, 'No images with loading="lazy" found.');
-    this.printTable(filtered);
+    this.drawImagesHtml(filtered)
   }
   public withoutLoadingAttribute() {
     this.showTitle("Images without loading attribute:");
     const filtered = this.images.filter((img) => !img.loading || img.loading.trim() === "");
     this.emptyData(filtered, "No images without loading attribute found.");
-    this.printTable(filtered);
+    this.drawImagesHtml(filtered)
   }
-  private drawImageHtml(img: TImageInfo) {
-    const alt = img.alt ? ` alt="${img.alt}"` : "";
-    const loading = img.loading ? ` loading="${img.loading}"` : "";
-    const image_html = `
-    class: "${img.parent_class}"
-    <img src="${img.url}" ${alt}${loading}>`;
-    console.log(image_html);
-  }
-
-  public printTable(filtered: TImageInfo[] = this.images) {
-    const rows = filtered.map((img) => ({
-      url: img.url || "",
-      alt: img.alt || "",
-      loading: img.loading || "",
-      parent_class: img.parent_class || "",
-    }));
-
-    console.log(
-      table3(rows, ["url", "alt", "loading", "parent_class"] as const, {
-        head: ["URL", "ALT", "LOADING", "PARENT CLASS"] as const,
-      })
-    );
-    return;
+  private drawImagesHtml(images: TImageInfo[]) {
+    for (const img of images) {
+      const alt = img.alt ? ` alt="${img.alt}"` : "";
+      const loading = img.loading ? ` loading="${img.loading}"` : "";
+      const image_html = `<img src="${img.url}"${alt}${loading}>`;
+      console.log(image_html);
+    }
   }
 }

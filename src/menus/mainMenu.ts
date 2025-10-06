@@ -6,6 +6,7 @@ import getPages from "./getPages.js";
 import getSeoSubMenu from "./getSeoSubMenu.js";
 import getImagesSubMenu from "./getImagesSubMenu.js";
 import chalk from "chalk";
+import imageMenu from "./imageMenu.js";
 
 export default async function mainMenu(urls: string[]): Promise<void> {
   while (true) {
@@ -35,11 +36,11 @@ export default async function mainMenu(urls: string[]): Promise<void> {
         if (res === "exit") return;
       }
 
-      // if (section === "images" && page.images && menu_choices.images) {
-      //   const imagesMenu = await import("./imagesMenu.js");
-      //   const res = await imagesMenu.default(page.images, menu_choices.images);
-      //   if (res === "exit") return;
-      // }
+      if (section === "images" && page.images && menu_choices.images) {
+        console.log(chalk.yellow(`\n— Results for: ${page.url} —`));
+        const res = await imageMenu(page.images, menu_choices.images);
+        if (res === "exit") return;
+      }
     }
 
     // после прохода по всем ссылкам предложим выбрать следующее действие
