@@ -45,48 +45,18 @@ export class SeoHandler {
 
   public seoTitle() {
     this.showTitle("Seo title:");
-    this.printTable('title');
+    console.log(this.seo.title ? this.seo.title : chalk.red("No seo title found."));
   }
   public seoDescription() {
     this.showTitle("Seo description:");
-    this.printTable('description');
+    console.log(this.seo.description ? this.seo.description : chalk.red("No seo description found."));
   }
   public seoOgImage() {
     this.showTitle("Seo og image:");
-    this.printTable('og_image');
+    console.log(this.seo.ogImage ? this.seo.ogImage : chalk.red("No seo og image found."));
   }
   public seoRobots() {
     this.showTitle("Seo robots:");
-    this.printTable('robots');
-  }
-
-  public printTable(type?: "title" | "description" | "og_image" | "robots") {
-    // маппинг твоих псевдонимов на реальные ключи в TSeoInfo
-    const map: Record<NonNullable<typeof type>, keyof TSeoInfo> = {
-      title: "title",
-      description: "description",
-      og_image: "ogImage",
-      robots: "robots",
-    };
-
-    const row = this.seo;
-    if (!type) {
-      console.log(
-        table3([row], ["title", "description", "ogImage", "robots"] as const, {
-          head: ["Title", "Description", "OG Image", "Robots"] as const,
-          colWidths: [40, 40, 40, 20] as const,
-        })
-      );
-      return;
-    }
-
-    // печать одной колонки
-    const key = map[type];
-    console.log(
-      table3([row], [key] as const, {
-        head: [type.toUpperCase()] as const,
-        colWidths: [60] as const,
-      })
-    );
+    console.log(this.seo.robots ? this.seo.robots : chalk.red("No seo robots found."));
   }
 }

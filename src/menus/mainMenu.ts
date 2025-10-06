@@ -1,75 +1,45 @@
 import { isCancel, select } from "@clack/prompts";
-import HtmlParse from "../classes/HtmlParse.js";
-import seoMenu from "./seoMenu.js";
-import imageMenu from "./imageMenu.js";
-import htmlMenu from "./htmlMenu.js";
+import { TSeoSubMenu } from "../data/seo_sub_menu_data.js";
+import getMenuSection from "./getMenuSection.js";
+import { TPage } from "../types/TPage.js";
+import getPages from "./getPages.js";
+import getSeoSubMenu from "./getSeoSubMenu.js";
+import getImagesSubMenu from "./getImagesSubMenu.js";
 import chalk from "chalk";
-import { seo_sub_menu_data, TSeoSubMenu } from "../data/seo_sub_menu_data.js";
-import chalkMultiSelect from "../utils/chalkMultiSelect.js";
-
-type Section = "seo" | "images" | "links" | "exit";
 
 export default async function mainMenu(urls: string[]): Promise<void> {
-  // бесконечный цикл, чтобы после выполнения по всем ссылкам можно было выбрать новое действие
   while (true) {
-    const section = (await select({
-      message: "What to extract (applies to ALL passed URLs)?",
-      options: [
-        { label: "SEO", value: "seo" },
-        { label: "Images", value: "images" },
-        { label: "Links", value: "links" },
-        { label: "Exit", value: "exit" },
-      ] as const,
-    })) as Section | symbol;
-
+    const section = await getMenuSection();
     if (isCancel(section) || section === "exit") return;
 
-    const menu_choices = {
-      seo: [] as string[],
-      images: [] as string[],
-      links: [] as string[],
-    };
+    const pages: TPage[] = await getPages(urls, section);
+
+    const menu_choices: {
+      seo?: TSeoSubMenu[];
+      images?: string[];
+    } = {};
 
     if (section === "seo") {
-      menu_choices.seo = await chalkMultiSelect({
-        message: "Select SEO options (use space to select multiple):",
-        options: seo_sub_menu_data,
-      }) as TSeoSubMenu[];
+      menu_choices.seo = await getSeoSubMenu();
     }
 
     if (section === "images") {
-      menu_choices.images = await htmlMenu([
-        { label: "All", value: "all" },
-        { label: "With alt", value: "alt" },
-        { label: "Without alt", value: "no-alt" },
-        { label: 'With loading="lazy"', value: "lazy" },
-        { label: "Without loading attribute", value: "no-loading" },
-        { label: "Back", value: "back" },
-        { label: "Exit", value: "exit" },
-      ]);
+      menu_choices.images = await getImagesSubMenu();
     }
 
-    // прогоняем выбранное действие по всем URL
-    for (const url of urls) {
-      const parser = new HtmlParse(url);
-      console.log(chalk.yellow(`\n— Processing: ${url}`));
-
-      if (section === "seo") {
-        const seo = await parser.getSeo();
-        const res = await seoMenu(seo, menu_choices.seo);
+    for (const page of pages) {
+      if (section === "seo" && page.seo && menu_choices.seo) {
+        const seoMenu = await import("./seoMenu.js");
+        console.log(chalk.yellow(`\n— Results for: ${page.url} —`));
+        const res = await seoMenu.default(page.seo, menu_choices.seo);
         if (res === "exit") return;
       }
 
-      if (section === "links") {
-        const links = await parser.getAllLinks();
-        console.log("Links:", links);
-      }
-
-      if (section === "images") {
-        const images = await parser.getAllImages();
-        const res = await imageMenu(images, menu_choices.images); // если внутри будет "exit" — выходим глобально
-        if (res === "exit") return;
-      }
+      // if (section === "images" && page.images && menu_choices.images) {
+      //   const imagesMenu = await import("./imagesMenu.js");
+      //   const res = await imagesMenu.default(page.images, menu_choices.images);
+      //   if (res === "exit") return;
+      // }
     }
 
     // после прохода по всем ссылкам предложим выбрать следующее действие
