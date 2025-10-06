@@ -1,26 +1,114 @@
 import type * as cheerio from "cheerio";
 import { load as loadHTML, CheerioAPI } from "cheerio";
+import { promises as fs } from "node:fs";
+import path from "node:path";
 import { TImageInfo, TLinkInfo, TSeoInfo } from "../types/THtmlResponse.js";
 import { UrlHelper } from "../utils/UrlHelper.js";
+
+type ParseOpts = {
+  timeoutMs?: number;
+  userAgent?: string;
+  /** Directory where HTML files are cached/saved. Default ".html-cache" */
+  cacheDir?: string;
+  /** Consider cache fresh for this many ms. If omitted, reuse forever. */
+  maxAgeMs?: number;
+  /** Force re-download even if a fresh cache exists. Overrides maxAgeMs. */
+  force?: boolean;
+};
 
 export default class HtmlParse {
   private baseUrl: string;
   private timeoutMs: number;
   private userAgent: string;
+  private cacheDir: string;
+  private maxAgeMs?: number;
+  private force: boolean;
+
   private _html: string | null = null;
   private _$: CheerioAPI | null = null;
   private _headers: Headers | null = null;
 
-  constructor(url: string, opts: { timeoutMs?: number; userAgent?: string } = {}) {
+  constructor(url: string, opts: ParseOpts = {}) {
     if (!/^https?:\/\//i.test(url)) throw new Error("Url must start with http(s)://");
     this.baseUrl = new URL(url).toString();
     this.timeoutMs = opts.timeoutMs ?? 15_000;
     this.userAgent =
       opts.userAgent ?? "Mozilla/5.0 (compatible; HtmlParseBot/1.0; +https://example.invalid/bot)";
+    this.cacheDir = opts.cacheDir ?? ".html-cache";
+    this.maxAgeMs = opts.maxAgeMs;
+    this.force = !!opts.force;
   }
 
+  // ---------- Cache helpers ----------
+  private urlToCachePaths(u: string) {
+    const url = new URL(u);
+    // Build a safe filename:
+    // - / => path parts; empty path -> "index"
+    // - query -> stable key=value pairs appended
+    const parts = url.pathname.replace(/\/+/g, "/").split("/").filter(Boolean);
+    const base = parts.length ? parts.join("_") : "index";
+    const qs = url.searchParams.toString(); // already sorted insertion order; good enough
+    const fileBase = (qs ? `${base}__${qs}` : base)
+      .replace(/[^\w.-]+/g, "_") // keep word chars, dot, dash
+      .replace(/_+/g, "_") // collapse
+      .replace(/^_+|_+$/g, ""); // trim
+
+    const dir = path.join(this.cacheDir, url.hostname);
+    const htmlPath = path.join(dir, `${fileBase}.html`);
+    const headersPath = path.join(dir, `${fileBase}.headers.json`);
+    return { dir, htmlPath, headersPath };
+  }
+
+  private async readCache(): Promise<{ html: string; headers?: Headers } | null> {
+    const { htmlPath, headersPath } = this.urlToCachePaths(this.baseUrl);
+    try {
+      // If maxAgeMs is set, check staleness by mtime
+      if (!this.force && this.maxAgeMs != null) {
+        const st = await fs.stat(htmlPath);
+        const age = Date.now() - st.mtimeMs;
+        if (age > this.maxAgeMs) return null; // stale
+      }
+      const html = await fs.readFile(htmlPath, "utf8");
+      let headers: Headers | undefined;
+      try {
+        const raw = await fs.readFile(headersPath, "utf8");
+        const obj = JSON.parse(raw) as Record<string, string>;
+        headers = new Headers(obj);
+      } catch {
+        /* no headers cached */
+      }
+      return { html, headers };
+    } catch {
+      return null;
+    }
+  }
+
+  private async writeCache(html: string, headers: Headers | null) {
+    const { dir, htmlPath, headersPath } = this.urlToCachePaths(this.baseUrl);
+    await fs.mkdir(dir, { recursive: true });
+    await fs.writeFile(htmlPath, html, "utf8");
+    if (headers) {
+      const obj: Record<string, string> = {};
+      headers.forEach((v, k) => (obj[k] = v));
+      await fs.writeFile(headersPath, JSON.stringify(obj, null, 2), "utf8");
+    }
+  }
+
+  // ---------- Fetch (with cache) ----------
   private async fetchOnce() {
     if (this._$) return;
+
+    // Try cache first (unless force)
+    if (!this.force) {
+      const cached = await this.readCache();
+      if (cached) {
+        this._html = cached.html;
+        this._headers = cached.headers ?? null;
+        this._$ = loadHTML(this._html, { xmlMode: false });
+        return;
+      }
+    }
+
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort(), this.timeoutMs);
 
@@ -36,11 +124,22 @@ export default class HtmlParse {
 
     if (!res.ok) throw new Error(`HTTP ${res.status} for ${this.baseUrl}`);
 
+    const ct = res.headers.get("content-type") || "";
+    // Optional: only cache/parse HTML-like responses
+    if (!/text\/html|application\/xhtml\+xml/i.test(ct)) {
+      // Still allow reading, but you may choose to throw instead
+    }
+
     this._headers = res.headers;
     this._html = await res.text();
+
+    // Save to disk cache
+    await this.writeCache(this._html, this._headers);
+
     this._$ = loadHTML(this._html, { xmlMode: false });
   }
 
+  // ---------- Public API ----------
   async getSeo(): Promise<TSeoInfo> {
     await this.fetchOnce();
     const $ = this._$!;
@@ -88,7 +187,6 @@ export default class HtmlParse {
       results.push({ url: abs, text, rel, target, external, nofollow });
     });
 
-    // уникализация по url
     const seen = new Set<string>();
     return results.filter((r) => {
       if (seen.has(r.url)) return false;
@@ -124,13 +222,12 @@ export default class HtmlParse {
   }
 
   private findNearestParentClass($el: cheerio.Cheerio<cheerio.Element>): string | null {
-    // Идём вверх по одному уровню за раз, чтобы гарантированно взять БЛИЖАЙШЕГО родителя с классом
     let $p = $el.parent();
     while ($p.length) {
       const cls = $p.attr("class")?.trim();
-      if (cls) return cls; // нашли непустой class — возвращаем
-      $p = $p.parent(); // иначе поднимаемся ещё выше
+      if (cls) return cls;
+      $p = $p.parent();
     }
-    return null; // до корня дошли — не нашли
+    return null;
   }
 }
