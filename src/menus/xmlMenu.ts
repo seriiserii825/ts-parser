@@ -49,13 +49,17 @@ async function getCollectionFromLink(parser: XmlParse, link: string): Promise<st
 }
 
 async function getLinksToParse(links: string[]): Promise<string[]> {
+  const allOption = { value: "__all__", label: "✅ Select all" };
   const choices = await chalkMultiSelect({
     message: "Select links to parse (use space to select multiple):",
-    options: links.map((link) => ({ label: link, value: link })),
+    options: [allOption, ...links.map((link) => ({ label: link, value: link }))],
   });
   if (!choices || choices.length === 0) {
     console.log(chalk.red("No links selected. Exiting..."));
     return [];
+  }
+  if (choices.includes(allOption.value)) {
+    return links;
   }
   return choices;
 }

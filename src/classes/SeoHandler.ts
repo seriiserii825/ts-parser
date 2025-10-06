@@ -1,8 +1,5 @@
 import chalk from "chalk";
 import { TSeoInfo } from "../types/THtmlResponse.js";
-import { ColumnOptionsRaw } from "console-table-printer/dist/src/models/external-table.js";
-import tablePrinter from "../utils/tablePrinter.js";
-import table3 from "../utils/table3.js";
 
 type TSeoType = "title" | "description" | "og_image" | "robots";
 
@@ -58,5 +55,20 @@ export class SeoHandler {
   public seoRobots() {
     this.showTitle("Seo robots:");
     console.log(this.seo.robots ? this.seo.robots : chalk.red("No seo robots found."));
+  }
+
+  public seoMissing(){
+    this.showTitle("Missing seo tags:");
+    const missing: string[] = [];
+    if (!this.seo.title) missing.push("title");
+    if (!this.seo.description) missing.push("description");
+    if (!this.seo.ogImage) missing.push("og_image");
+    if (!this.seo.robots) missing.push("robots");
+
+    if (missing.length === 0) {
+      console.log(chalk.green("All main seo tags are present."));
+    } else {
+      console.log(chalk.red(`Missing seo tags: ${missing.join(", ")}`));
+    }
   }
 }

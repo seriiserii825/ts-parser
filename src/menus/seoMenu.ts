@@ -37,6 +37,9 @@ export default async function seoMenu(seo: TSeoInfo, choices: TSeoSubMenu[]): Pr
       case "robots":
         so.seoRobots();
         break;
+      case "missing":
+        so.seoMissing();
+        break;
       case "back":
       case "exit":
         // обработали выше
