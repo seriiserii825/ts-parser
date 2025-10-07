@@ -20,32 +20,32 @@ export class ImageHandler {
   public all() {
     this.showTitle("All images:");
     this.emptyData(this.images, "No images found.");
-    this.drawImagesHtml(this.images)
+    this.drawImagesHtml(this.images);
   }
 
   public emptyAlt() {
-    this.showTitle("Images with empty alt attribute:");
     const filtered = this.images.filter((img) => !img.alt || img.alt.trim() === "");
-    this.emptyData(filtered, "No images with empty alt attribute found.");
-    this.drawImagesHtml(filtered)
+    if (filtered.length === 0) return;
+    this.showTitle("Images with empty alt attribute:");
+    this.drawImagesHtml(filtered);
   }
   public withAlt() {
-    this.showTitle("Images with filled alt attribute:");
     const filtered = this.images.filter((img) => img.alt && img.alt.trim() !== "");
-    this.emptyData(filtered, "No images with filled alt attribute found.");
-    this.drawImagesHtml(filtered)
+    if (filtered.length === 0) return;
+    this.showTitle("Images with filled alt attribute:");
+    this.drawImagesHtml(filtered);
   }
   public withLazyLoading() {
-    this.showTitle('Images with loading="lazy":');
     const filtered = this.images.filter((img) => img.loading?.toLowerCase() === "lazy");
-    this.emptyData(filtered, 'No images with loading="lazy" found.');
-    this.drawImagesHtml(filtered)
+    if (filtered.length === 0) return;
+    this.showTitle('Images with loading="lazy":');
+    this.drawImagesHtml(filtered);
   }
   public withoutLoadingAttribute() {
-    this.showTitle("Images without loading attribute:");
     const filtered = this.images.filter((img) => !img.loading || img.loading.trim() === "");
-    this.emptyData(filtered, "No images without loading attribute found.");
-    this.drawImagesHtml(filtered)
+    if (filtered.length === 0) return;
+    this.showTitle("Images without loading attribute:");
+    this.drawImagesHtml(filtered);
   }
   private drawImagesHtml(images: TImageInfo[]) {
     for (const img of images) {

@@ -1,12 +1,14 @@
 import { TImageInfo } from "../types/THtmlResponse.js";
 import { ImageHandler } from "../classes/ImageHandler.js";
+import {TPage} from "../types/TPage.js";
 
 type ImageMenuResult = "back" | "exit";
 
 export default async function imageMenu(
-  images: TImageInfo[],
+  page: TPage,
   choices: string[]
 ): Promise<ImageMenuResult | void> {
+  const images: TImageInfo[] = page.images;
   const ih = new ImageHandler(images);
 
   if (choices.includes("exit")) return "exit";

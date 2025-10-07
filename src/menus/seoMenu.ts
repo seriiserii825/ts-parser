@@ -1,10 +1,12 @@
 import { TSeoInfo } from "../types/THtmlResponse.js";
 import { SeoHandler } from "../classes/SeoHandler.js";
 import {TSeoSubMenu} from "../data/seo_sub_menu_data.js";
+import {TPage} from "../types/TPage.js";
 
 type MenuResult = "back" | "exit";
 
-export default async function seoMenu(seo: TSeoInfo, choices: TSeoSubMenu[]): Promise<MenuResult | void> {
+export default async function seoMenu(page: TPage, choices: TSeoSubMenu[]): Promise<MenuResult | void> {
+  const seo: TSeoInfo = page.seo;
   const so = new SeoHandler(seo);
   // Exit всегда имеет приоритет
   if (choices.includes("exit")) return "exit";

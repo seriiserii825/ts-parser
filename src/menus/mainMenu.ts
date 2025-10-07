@@ -37,20 +37,17 @@ export default async function mainMenu(urls: string[]): Promise<void> {
     for (const page of pages) {
       if (section === "seo" && page.seo && menu_choices.seo) {
         const seoMenu = await import("./seoMenu.js");
-        console.log(chalk.yellow(`\n— Results for: ${page.url} —`));
-        const res = await seoMenu.default(page.seo, menu_choices.seo);
+        const res = await seoMenu.default(page, menu_choices.seo);
         if (res === "exit") return;
       }
 
       if (section === "images" && page.images && menu_choices.images) {
-        console.log(chalk.yellow(`\n— Results for: ${page.url} —`));
-        const res = await imageMenu(page.images, menu_choices.images);
+        const res = await imageMenu(page, menu_choices.images);
         if (res === "exit") return;
       }
       if (section === "links" && page.links && menu_choices.links) {
         const linksMenu = await import("./linksMenu.js");
-        console.log(chalk.yellow(`\n— Results for: ${page.url} —`));
-        const res = await linksMenu.default(page.links, menu_choices.links);
+        const res = await linksMenu.default(page, menu_choices.links);
         if (res === "exit") return;
       }
     }

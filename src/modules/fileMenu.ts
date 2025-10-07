@@ -9,8 +9,8 @@ export default async function fileMenu(): Promise<string | undefined> {
   while (true) {
     const message = "File Menu: choose an action";
     const options: TOption[] = [
-      { label: "View", value: "list" },
       { label: "Select", value: "select" },
+      { label: "View", value: "list" },
       { label: "Add", value: "add" },
       { label: "Edit", value: "edit" },
       { label: "Delete", value: "remove" },

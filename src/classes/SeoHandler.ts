@@ -41,6 +41,7 @@ export class SeoHandler {
   }
 
   public seoTitle() {
+    if (this.emptyData("title")) return;
     this.showTitle("Seo title:");
     console.log(this.seo.title ? this.seo.title : chalk.red("No seo title found."));
   }

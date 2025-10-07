@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import {TLinkInfo} from "../types/THtmlResponse.js";
+import { TLinkInfo } from "../types/THtmlResponse.js";
 
 export class LinksHandler {
   private links: TLinkInfo[];
@@ -20,20 +20,20 @@ export class LinksHandler {
   public all() {
     this.showTitle("All links:");
     this.emptyData(this.links, "No links found.");
-    this.drawLinksHtml(this.links)
+    this.drawLinksHtml(this.links);
   }
 
   public empty() {
-    this.showTitle("Links with empty alt attribute:");
     const filtered = this.links.filter((link) => !link.url || link.url.trim() === "");
-    this.emptyData(filtered, "No links with empty alt attribute found.");
-    this.drawLinksHtml(filtered)
+    if (filtered.length === 0) return;
+    this.showTitle("Links with empty alt attribute:");
+    this.drawLinksHtml(filtered);
   }
   public withHash() {
-    this.showTitle("Links with hash:");
     const filtered = this.links.filter((link) => link.url.includes("#"));
-    this.emptyData(filtered, "No links with hash.");
-    this.drawLinksHtml(filtered)
+    if (filtered.length === 0) return;
+    this.showTitle("Links with hash:");
+    this.drawLinksHtml(filtered);
   }
   private drawLinksHtml(links: TLinkInfo[]) {
     for (const link of links) {
