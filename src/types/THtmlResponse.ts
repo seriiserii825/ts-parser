@@ -12,6 +12,7 @@ export type TLinkInfo = {
   target?: string;
   external: boolean;
   nofollow: boolean;
+  parent_class: string;
 };
 
 export type TImageInfo = {

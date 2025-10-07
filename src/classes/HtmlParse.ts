@@ -184,7 +184,9 @@ export default class HtmlParse {
 
       const nofollow = /\bnofollow\b/i.test(rel || "");
 
-      results.push({ url: abs, text, rel, target, external, nofollow });
+      const parent_class = this.findNearestParentClass($a) || "";
+
+      results.push({ url: abs, text, rel, target, external, nofollow, parent_class });
     });
 
     const seen = new Set<string>();

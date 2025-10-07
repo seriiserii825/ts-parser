@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import { TLinkInfo } from "../types/THtmlResponse.js";
+import table3 from "../utils/table3.js";
 
 export class LinksHandler {
   private links: TLinkInfo[];
@@ -20,24 +21,27 @@ export class LinksHandler {
   public all() {
     this.showTitle("All links:");
     this.emptyData(this.links, "No links found.");
-    this.drawLinksHtml(this.links);
+    this.drawHtml(this.links);
   }
 
   public empty() {
     const filtered = this.links.filter((link) => !link.url || link.url.trim() === "");
     if (filtered.length === 0) return;
     this.showTitle("Links with empty alt attribute:");
-    this.drawLinksHtml(filtered);
+    this.drawHtml(filtered);
   }
   public withHash() {
     const filtered = this.links.filter((link) => link.url.includes("#"));
     if (filtered.length === 0) return;
     this.showTitle("Links with hash:");
-    this.drawLinksHtml(filtered);
+    this.drawHtml(filtered);
   }
-  private drawLinksHtml(links: TLinkInfo[]) {
+  private drawHtml(links: TLinkInfo[]) {
     for (const link of links) {
-      const link_html = `<a href="${link.url}">${link.text || link.url}</a>`;
+      const rel = link.rel ? ` rel="${link.rel}"` : "";
+      const target = link.target ? ` target="${link.target}"` : "";
+      const link_html = `parent class: ${link.parent_class} -
+      <a href="${link.url}" ${rel} ${target}>${link.text}</a>`;
       console.log(link_html);
     }
   }
