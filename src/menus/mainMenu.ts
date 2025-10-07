@@ -7,6 +7,7 @@ import getSeoSubMenu from "./getSeoSubMenu.js";
 import getImagesSubMenu from "./getImagesSubMenu.js";
 import chalk from "chalk";
 import imageMenu from "./imageMenu.js";
+import getLinksSubmenu from "./getLinksSubmenu.js";
 
 export default async function mainMenu(urls: string[]): Promise<void> {
   while (true) {
@@ -18,6 +19,7 @@ export default async function mainMenu(urls: string[]): Promise<void> {
     const menu_choices: {
       seo?: TSeoSubMenu[];
       images?: string[];
+      links?: string[]
     } = {};
 
     if (section === "seo") {
@@ -26,6 +28,10 @@ export default async function mainMenu(urls: string[]): Promise<void> {
 
     if (section === "images") {
       menu_choices.images = await getImagesSubMenu();
+    }
+
+    if (section === "links") {
+      menu_choices.links = await getLinksSubmenu();
     }
 
     for (const page of pages) {
@@ -39,6 +45,12 @@ export default async function mainMenu(urls: string[]): Promise<void> {
       if (section === "images" && page.images && menu_choices.images) {
         console.log(chalk.yellow(`\n— Results for: ${page.url} —`));
         const res = await imageMenu(page.images, menu_choices.images);
+        if (res === "exit") return;
+      }
+      if (section === "links" && page.links && menu_choices.links) {
+        const linksMenu = await import("./linksMenu.js");
+        console.log(chalk.yellow(`\n— Results for: ${page.url} —`));
+        const res = await linksMenu.default(page.links, menu_choices.links);
         if (res === "exit") return;
       }
     }

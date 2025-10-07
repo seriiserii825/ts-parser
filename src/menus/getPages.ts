@@ -1,8 +1,7 @@
 import chalk from "chalk";
 import HtmlParse from "../classes/HtmlParse.js";
-import { TImageInfo, TSeoInfo } from "../types/THtmlResponse.js";
-import {TSection} from "../types/TSection.js";
-import {TPage} from "../types/TPage.js";
+import { TSection } from "../types/TSection.js";
+import { TPage } from "../types/TPage.js";
 
 export default async function getPages(urls: string[], section: TSection): Promise<TPage[]> {
   const pages: TPage[] = [];
@@ -12,17 +11,17 @@ export default async function getPages(urls: string[], section: TSection): Promi
 
     if (section === "seo") {
       const seo = await parser.getSeo();
-      pages.push({url: url , seo, images: [] });
+      pages.push({ url: url, seo });
     }
 
     if (section === "images") {
       const images = await parser.getAllImages();
-      pages.push({url: url, seo: {} as TSeoInfo, images });
+      pages.push({ url: url, images });
     }
 
     if (section === "links") {
       const links = await parser.getAllLinks();
-      console.log("Links:", links);
+      pages.push({ url: url, links });
     }
   }
   return pages;
