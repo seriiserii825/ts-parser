@@ -23,6 +23,10 @@ export default async function getPages(urls: string[], section: TSection): Promi
       const links = await parser.getAllLinks();
       pages.push({ url: url, links });
     }
+    if (section === "ids") {
+      const ids = await parser.getAllIds();
+      pages.push({ url: url, ids });
+    }
   }
   return pages;
 }

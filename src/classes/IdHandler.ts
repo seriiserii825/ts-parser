@@ -24,15 +24,9 @@ export class IdHandler {
     this.drawHtml(this.ids);
   }
 
-  public empty() {
-    const filtered = this.links.filter((link) => !link.url || link.url.trim() === "");
-    if (filtered.length === 0) return;
-    this.showTitle("Links with empty alt attribute:");
-    this.drawHtml(filtered);
-  }
   private drawHtml(ids: string[]) {
     for (const id of ids) {
-      console.log(`id: ${id}`);
+        console.log(`<div id="${id}"></div>`);
     }
   }
 }

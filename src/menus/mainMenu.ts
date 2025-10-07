@@ -19,7 +19,7 @@ export default async function mainMenu(urls: string[]): Promise<void> {
     const menu_choices: {
       seo?: TSeoSubMenu[];
       images?: string[];
-      links?: string[]
+      links?: string[];
       ids?: string[];
     } = {};
 
