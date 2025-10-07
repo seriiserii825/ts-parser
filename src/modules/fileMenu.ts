@@ -1,31 +1,30 @@
 import chalk from "chalk";
 import chalkSelect from "../utils/chalkSelect.js";
 import UrlsManager from "./getDomain.js";
-import {TOption} from "../types/TOption.js";
+import { TOption } from "../types/TOption.js";
 
 export default async function fileMenu(): Promise<string | undefined> {
   await UrlsManager.ensureUrlsFile();
 
   while (true) {
-    const message = "Меню";
+    const message = "File Menu: choose an action";
     const options: TOption[] = [
-      { label: "Просмотреть", value: "list" },
-      { label: "Выбрать", value: "select" },
-      { label: "Добавить", value: "add" },
-      { label: "Редактировать", value: "edit" },
-      { label: "Удалить", value: "remove" },
-      { label: "Очистить", value: "clear" },
-      { label: "Выход", value: "exit" },
+      { label: "View", value: "list" },
+      { label: "Select", value: "select" },
+      { label: "Add", value: "add" },
+      { label: "Edit", value: "edit" },
+      { label: "Delete", value: "remove" },
+      { label: "Clear", value: "clear" },
+      { label: "Exit", value: "exit" },
     ];
     const action = await chalkSelect({ message, options });
 
     try {
       if (action === "list") await UrlsManager.list();
       else if (action === "select") {
-        const url = await UrlsManager.select()
+        const url = await UrlsManager.select();
         return url;
-      }
-      else if (action === "add") {
+      } else if (action === "add") {
         await UrlsManager.add();
         await UrlsManager.list();
       } else if (action === "edit") await UrlsManager.edit();

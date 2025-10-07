@@ -24,7 +24,7 @@ export default class UrlsManager {
     const exists = await fs.pathExists(filePath);
     if (!exists) {
       await fs.writeFile(filePath, "", "utf8");
-      console.log(chalk.gray(`Создан пустой файл ${UrlsManager.FILE_NAME}`));
+      console.log(chalk.gray(`Created empty file ${UrlsManager.FILE_NAME}`));
     }
     return filePath;
   }
@@ -62,9 +62,9 @@ export default class UrlsManager {
   static async list(): Promise<void> {
     const urls = await UrlsManager.readUrls();
     if (urls.length === 0) {
-      console.log(chalk.yellow("Файл пуст. Добавьте первую ссылку."));
+      console.log(chalk.yellow("Empty file. Add the first URL."));
     } else {
-      console.log(chalk.cyan(`\nСодержимое ${UrlsManager.FILE_NAME}:`));
+      console.log(chalk.cyan(`\nContent ${UrlsManager.FILE_NAME}:`));
       urls.forEach((u, i) => {
         console.log(chalk.gray(String(i + 1).padStart(2, " ")), u);
       });
@@ -75,23 +75,25 @@ export default class UrlsManager {
   static async select(): Promise<string> {
     const urls = await UrlsManager.readUrls();
     if (urls.length === 0) {
-      console.log(chalk.yellow("Файл пуст. Добавьте первую ссылку."));
+      console.log(chalk.yellow("Empty file. Add the first URL."));
       return "";
     }
-    console.log(chalk.cyan(`\nСодержимое ${UrlsManager.FILE_NAME}:`));
+    console.log(chalk.cyan(`\nContent ${UrlsManager.FILE_NAME}:`));
     urls.forEach((u, i) => {
       console.log(chalk.gray(String(i + 1).padStart(2, " ")), u);
     });
     const index = await chalkSelect({
-      message: "Выберите URL",
+      message: "Choose a URL",
       options: urls.map((u, i) => ({ label: u, value: String(i) })),
     });
     return urls[Number(index)];
   }
 
   static async add(): Promise<void> {
+    const clipboard = await ClipboardManager.read();
+    console.log(chalk.gray(`Clipboard content: ${clipboard || "<empty>"}`));
     const input = await chalkInput({
-      message: "Ввести url или вставить из буфера обмена, y/n?: ",
+      message: "Enter url (y), or get from clipboard: ",
       placeholder: "",
       initialValue: "",
       validate: (value) =>
@@ -99,15 +101,14 @@ export default class UrlsManager {
     });
 
     if (input === "y") {
-      const clipboard = await ClipboardManager.read();
       if (UrlsManager.isValidHTTPUrl(clipboard)) {
         const urls = await UrlsManager.readUrls();
         urls.push(clipboard.trim());
         await UrlsManager.writeUrls(urls);
-        console.log(chalk.green("Добавлено!"));
+        console.log(chalk.green(`Added ${clipboard}!`));
         await UrlsManager.list();
       } else {
-        console.log(chalk.red("Буфер обмена не содержит корректный http(s) URL."));
+        console.log(chalk.red("Clipboard does not contain a valid http(s) URL."));
       }
     } else {
       const url = await chalkInput({
@@ -117,12 +118,12 @@ export default class UrlsManager {
         validate: (value) =>
           UrlsManager.isValidHTTPUrl(value)
             ? ""
-            : "Нужен корректный http(s) URL",
+            : "Required a valid http(s) URL",
       });
       const urls = await UrlsManager.readUrls();
       urls.push(url.trim());
       await UrlsManager.writeUrls(urls);
-      console.log(chalk.green("Добавлено!"));
+      console.log(chalk.green(`Added ${url}!`));
       await UrlsManager.list();
     }
   }
@@ -130,48 +131,48 @@ export default class UrlsManager {
   static async edit(): Promise<void> {
     const urls = await UrlsManager.readUrls();
     if (urls.length === 0) {
-      console.log(chalk.yellow("Редактировать нечего — файл пуст."));
+      console.log(chalk.yellow("Nothing to edit — file is empty."));
       return;
     }
 
     const index = await chalkSelect({
-      message: "Выберите URL для редактирования",
+      message: "Choose a URL to edit",
       options: urls.map((u, i) => ({ label: u, value: String(i) })),
     });
     const numberIndex = Number(index);
     const oldVal = urls[numberIndex];
 
     const updated = await chalkInput({
-      message: "Отредактируйте URL:",
+      message: "Edit the URL:",
       placeholder: oldVal,
       initialValue: oldVal,
       validate: (value) =>
         UrlsManager.isValidHTTPUrl(value)
           ? ""
-          : "Нужен корректный http(s) URL",
+          : "Required a valid http(s) URL",
     });
 
     urls[numberIndex] = updated.trim();
     await UrlsManager.writeUrls(urls);
-    console.log(chalk.green("Обновлено!"));
+    console.log(chalk.green("Updated!"));
   }
 
   static async remove(): Promise<void> {
     const urls = await UrlsManager.readUrls();
     if (urls.length === 0) {
-      console.log(chalk.yellow("Удалять нечего — файл пуст."));
+      console.log(chalk.yellow("Nothing to remove — file is empty."));
       return;
     }
 
     const indexes = await chalkMultiSelect({
-      message: "Выберите URL для удаления",
+      message: "Choose URLs to remove",
       options: urls.map((u, i) => ({ label: u, value: String(i) })),
     });
 
     const toRemove = indexes.map((s) => Number(s));
     const keep = urls.filter((_, i) => !toRemove.includes(i));
     await UrlsManager.writeUrls(keep);
-    console.log(chalk.green(`Удалено: ${toRemove.length}`));
+    console.log(chalk.green(`Deleted: ${toRemove.length}`));
     await UrlsManager.list();
   }
 
@@ -179,14 +180,14 @@ export default class UrlsManager {
     const { ok } = await prompt<{ ok: boolean }>({
       type: "confirm",
       name: "ok",
-      message: `Очистить ${UrlsManager.FILE_NAME}? Это удалит все ссылки.`,
+      message: `Are you sure you want to clear ${UrlsManager.FILE_NAME}?`,
     });
 
     if (ok) {
       await UrlsManager.writeUrls([]);
-      console.log(chalk.green("Файл очищен."));
+      console.log(chalk.green("File cleared!"));
     } else {
-      console.log(chalk.gray("Отменено."));
+      console.log(chalk.gray("Cancelled."));
     }
   }
 }
