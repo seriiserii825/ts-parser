@@ -9,6 +9,7 @@ export default async function getMenuSection() {
       { label: "SEO", value: "seo" },
       { label: "Images", value: "images" },
       { label: "Links", value: "links" },
+      { label: "Ids", value: "ids" },
       { label: "Exit", value: "exit" },
     ] as const,
   })) as TSection | symbol;

@@ -1,6 +1,5 @@
 import chalk from "chalk";
 import { TLinkInfo } from "../types/THtmlResponse.js";
-import table3 from "../utils/table3.js";
 
 export class LinksHandler {
   private links: TLinkInfo[];

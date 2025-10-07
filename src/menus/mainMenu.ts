@@ -5,9 +5,9 @@ import { TPage } from "../types/TPage.js";
 import getPages from "./getPages.js";
 import getSeoSubMenu from "./getSeoSubMenu.js";
 import getImagesSubMenu from "./getImagesSubMenu.js";
-import chalk from "chalk";
 import imageMenu from "./imageMenu.js";
 import getLinksSubmenu from "./getLinksSubmenu.js";
+import getIdsSubMenu from "./getIdsSubmenu.js";
 
 export default async function mainMenu(urls: string[]): Promise<void> {
   while (true) {
@@ -20,6 +20,7 @@ export default async function mainMenu(urls: string[]): Promise<void> {
       seo?: TSeoSubMenu[];
       images?: string[];
       links?: string[]
+      ids?: string[];
     } = {};
 
     if (section === "seo") {
@@ -32,6 +33,10 @@ export default async function mainMenu(urls: string[]): Promise<void> {
 
     if (section === "links") {
       menu_choices.links = await getLinksSubmenu();
+    }
+
+    if (section === "ids") {
+      menu_choices.ids = await getIdsSubMenu();
     }
 
     for (const page of pages) {
@@ -48,6 +53,11 @@ export default async function mainMenu(urls: string[]): Promise<void> {
       if (section === "links" && page.links && menu_choices.links) {
         const linksMenu = await import("./linksMenu.js");
         const res = await linksMenu.default(page, menu_choices.links);
+        if (res === "exit") return;
+      }
+      if (section === "ids" && page.ids && menu_choices.ids) {
+        const idsMenu = await import("./idsMenu.js");
+        const res = await idsMenu.default(page, menu_choices.ids);
         if (res === "exit") return;
       }
     }

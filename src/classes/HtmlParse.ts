@@ -223,6 +223,26 @@ export default class HtmlParse {
     });
   }
 
+  async getAllIds(): Promise<string[]> {
+    await this.fetchOnce();
+    const $ = this._$!;
+    const results: string[] = [];
+
+    // Any element with an ID
+    $("[id]").each((_, el) => {
+      const $el = $(el);
+      const id = $el.attr("id")?.trim();
+      if (id) results.push(id);
+    });
+
+    const seen = new Set<string>();
+    return results.filter((id) => {
+      if (seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
+  }
+
   private findNearestParentClass($el: cheerio.Cheerio<cheerio.Element>): string | null {
     let $p = $el.parent();
     while ($p.length) {

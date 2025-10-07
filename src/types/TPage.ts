@@ -5,4 +5,5 @@ export type TPage = {
   seo: TSeoInfo;
   images: TImageInfo[];
   links: TLinkInfo[];
+  ids: string[];
 };

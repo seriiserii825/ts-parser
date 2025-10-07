@@ -1,1 +1,1 @@
-export type TSection = "seo" | "images" | "links" | "exit";
+export type TSection = "seo" | "images" | "links" | "ids" | "exit";
