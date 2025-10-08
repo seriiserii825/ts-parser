@@ -246,6 +246,22 @@ export default class HtmlParse {
     return results;
   }
 
+  async getAll(): Promise<{
+    seo: TSeoInfo;
+    links: TLinkInfo[];
+    images: TImageInfo[];
+    ids: string[];
+  }> {
+    await this.fetchOnce();
+    const [seo, links, images, ids] = await Promise.all([
+      this.getSeo(),
+      this.getAllLinks(),
+      this.getAllImages(),
+      this.getAllIds(),
+    ]);
+    return { seo, links, images, ids };
+  }
+
   private findNearestParentClass($el: cheerio.Cheerio<cheerio.Element>): string | null {
     let $p = $el.parent();
     while ($p.length) {

@@ -1,8 +1,6 @@
-import Select from "../classes/Select.js";
-import {TMainMenuValues} from "../types/TMainMenuValues.js";
-import { TOption } from "../types/TOption.js";
+import chalkMultiSelect from "../utils/chalkMultiSelect.js";
 
-export default async function mainMenu(): Promise<TMainMenuValues[]> {
+export default async function mainMenu(): Promise<string[]> {
   const message = "Select an option:";
   const menu_options = [
     { label: "1.Seo all", value: "seo_all" },
@@ -13,7 +11,10 @@ export default async function mainMenu(): Promise<TMainMenuValues[]> {
     { label: "6.Links broken hash", value: "links_broken_hash" },
     { label: "7.Ids duplicates", value: "ids_duplicates" },
     { label: "8.Exit", value: "exit" },
-  ] as const satisfies readonly TOption[];
+  ];
 
-  return Select.selectMultiple(message, menu_options);
+  return chalkMultiSelect({
+    message: message,
+    options: menu_options,
+  });
 }

@@ -3,8 +3,12 @@
 import chalk from "chalk";
 import fileMenu from "./modules/fileMenu.js";
 import mainMenu from "./menus/mainMenu.js";
-import { TMainMenuValues } from "./types/TMainMenuValues.js";
 import getUrlLinks from "./menus/getUrlLinks.js";
+import HtmlParse from "./classes/HtmlParse.js";
+import { SeoHandler } from "./classes/SeoHandler.js";
+import { ImageHandler } from "./classes/ImageHandler.js";
+import { LinksHandler } from "./classes/LinksHandler.js";
+import { IdHandler } from "./classes/IdHandler.js";
 
 async function main() {
   const url = await fileMenu();
@@ -13,10 +17,48 @@ async function main() {
     return;
   }
 
-  const menu_options = (await mainMenu()) as TMainMenuValues[];
+  const menu_options = await mainMenu();
 
   const url_links = await getUrlLinks(url);
-  console.log("url_links", url_links);
+  if (!url_links) {
+    console.log(chalk.red("No links found. Exiting..."));
+    return;
+  }
+
+  for (const url of url_links) {
+    const parser = new HtmlParse(url);
+    console.log(chalk.yellow(`\n— Processing: ${url}`));
+    const all = await parser.getAll();
+    for (const option of menu_options) {
+      const seo = new SeoHandler(all.seo);
+      const images = new ImageHandler(all.images);
+      const links = new LinksHandler(all.links);
+      const ids = new IdHandler(all.ids);
+
+      switch (option) {
+        case "seo_all":
+          seo.all();
+          break;
+        case "seo_missing":
+          seo.seoMissing();
+          break;
+        case "missing_alt":
+          images.emptyAlt();
+          break;
+        case "links_empty":
+          links.empty();
+          break;
+        case "links_hash":
+          links.withHash();
+          break;
+        case "ids_duplicates":
+          ids.duplicates();
+          break;
+        default:
+          break;
+      }
+    }
+  }
 }
 
 main();
