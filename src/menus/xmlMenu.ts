@@ -2,18 +2,18 @@ import chalk from "chalk";
 import XmlParse from "../classes/XmlParse.js";
 import chalkSelect from "../utils/chalkSelect.js";
 import chalkMultiSelect from "../utils/chalkMultiSelect.js";
-import mainMenu from "./mainMenu.js";
 
-export default async function xmlMenu(url: string): Promise<void> {
+export default async function xmlMenu(url: string): Promise<string[]> {
   const parser = new XmlParse();
   const links = await getSitemapLinks(parser, url);
-  if (!links) return;
+  if (!links) return [];
   const choice = await chooseALink(links);
-  if (!choice) return;
+  if (!choice) return [];
   const collection = await getCollectionFromLink(parser, choice);
-  if (collection.length === 0) return;
+  if (collection.length === 0) return [];
   const links_to_parse = await getLinksToParse(collection);
-  await mainMenu(links_to_parse);
+  if (links_to_parse.length === 0) return [];
+  return links_to_parse;
 }
 
 async function getSitemapLinks(parser: XmlParse, url: string): Promise<string[] | undefined> {
