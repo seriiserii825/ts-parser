@@ -9,15 +9,16 @@ export default async function fileMenu(): Promise<string | undefined> {
   while (true) {
     const message = "File Menu: choose an action";
     const options: TOption[] = [
-      { label: "Select", value: "select" },
-      { label: "View", value: "list" },
-      { label: "Add", value: "add" },
-      { label: "Edit", value: "edit" },
-      { label: "Delete", value: "remove" },
-      { label: "Clear", value: "clear" },
-      { label: "Exit", value: "exit" },
-    ];
-    const action = Select.selectOne(message, options);
+      { label: "1.Select", value: "select" },
+      { label: "2.View", value: "list" },
+      { label: "3.Add", value: "add" },
+      { label: "4.Edit", value: "edit" },
+      { label: "5.Delete", value: "remove" },
+      { label: "6.Clear", value: "clear" },
+      { label: "7.Exit", value: "exit" },
+    ] as const;
+
+    const action = Select.selectOne(message, options); // ✅ action is the union
 
     try {
       if (action === "list") await UrlsManager.list();

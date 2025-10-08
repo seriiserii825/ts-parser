@@ -1,2 +1,1 @@
 http://bs-csm-servizi.local/
-https://google.com
