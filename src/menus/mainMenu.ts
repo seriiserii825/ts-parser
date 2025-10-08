@@ -7,7 +7,7 @@ import getSeoSubMenu from "./getSeoSubMenu.js";
 import getImagesSubMenu from "./getImagesSubMenu.js";
 import imageMenu from "./imageMenu.js";
 import getLinksSubmenu from "./getLinksSubmenu.js";
-import getIdsSubMenu from "./getIdsSubmenu.js";
+import getIdsSubMenu, {TIdsSubMenu} from "./getIdsSubmenu.js";
 
 export default async function mainMenu(urls: string[]): Promise<void> {
   while (true) {
@@ -20,7 +20,7 @@ export default async function mainMenu(urls: string[]): Promise<void> {
       seo?: TSeoSubMenu[];
       images?: string[];
       links?: string[];
-      ids?: string[];
+      ids?: TIdsSubMenu[];
     } = {};
 
     if (section === "seo") {

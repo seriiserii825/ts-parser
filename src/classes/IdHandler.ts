@@ -24,6 +24,22 @@ export class IdHandler {
     this.drawHtml(this.ids);
   }
 
+  public duplicates(){
+    this.showTitle("Duplicate ids:");
+    const seen = new Set<string>();
+    const duplicates = new Set<string>();
+    for (const id of this.ids) {
+        if (seen.has(id)) {
+            duplicates.add(id);
+        } else {
+            seen.add(id);
+        }
+    }
+    const dupArray = Array.from(duplicates);
+    this.emptyData(dupArray, "No duplicate ids found.");
+    this.drawHtml(dupArray);
+  }
+
   private drawHtml(ids: string[]) {
     for (const id of ids) {
         console.log(`<div id="${id}"></div>`);

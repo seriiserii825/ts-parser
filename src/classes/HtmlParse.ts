@@ -227,20 +227,23 @@ export default class HtmlParse {
     await this.fetchOnce();
     const $ = this._$!;
     const results: string[] = [];
+    const excludedTags = new Set(["script", "style", "noscript", "g", "svg", "clipPath", "defs"]);
 
-    // Any element with an ID
-    $("[id]").each((_, el) => {
+    // find all elements with id
+    $("body [id]").each((_, el) => {
       const $el = $(el);
+      const tag = $el.prop("tagName")?.toLowerCase();
+      if (!tag) return;
+      // skip unwanted tags or if inside svg
+      if (excludedTags.has(tag) || $el.closest("svg").length > 0) return;
+
       const id = $el.attr("id")?.trim();
-      if (id) results.push(id);
+      if (id && !/^url\(#.+\)$/.test(id)) {
+        results.push(id);
+      }
     });
 
-    const seen = new Set<string>();
-    return results.filter((id) => {
-      if (seen.has(id)) return false;
-      seen.add(id);
-      return true;
-    });
+    return results;
   }
 
   private findNearestParentClass($el: cheerio.Cheerio<cheerio.Element>): string | null {

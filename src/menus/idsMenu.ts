@@ -1,14 +1,13 @@
 import chalk from "chalk";
 import { TPage } from "../types/TPage.js";
 import {IdHandler} from "../classes/IdHandler.js";
-
-type MenuResult = "back" | "exit";
+import {TIdsSubMenu} from "./getIdsSubmenu.js";
 
 export default async function idsMenu(
   page: TPage,
-  choices: string[]
-): Promise<MenuResult | void> {
-  const ids: string[] = page.ids;
+  choices: TIdsSubMenu[],
+): Promise<TIdsSubMenu | void> {
+  const ids: string[] = page.ids ?? [];
   const lh = new IdHandler(ids);
 
   if (choices.includes("exit")) return "exit";
@@ -27,9 +26,9 @@ export default async function idsMenu(
         printUrl();
         lh.all();
         break;
-      case "empty":
+      case "duplicates":
         printUrl();
-        lh.empty();
+        lh.duplicates();
         break;
       case "back":
       case "exit":
