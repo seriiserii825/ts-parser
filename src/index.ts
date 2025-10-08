@@ -4,7 +4,7 @@ import chalk from "chalk";
 import fileMenu from "./modules/fileMenu.js";
 import mainMenu from "./menus/mainMenu.js";
 import xmlMenu from "./menus/xmlMenu.js";
-import chalkSelect from "./utils/chalkSelect.js";
+import Select from "./classes/Select.js";
 
 async function main() {
   const url = await fileMenu();
@@ -13,14 +13,14 @@ async function main() {
     return;
   }
 
-  const choice = await chalkSelect({
-    message: "You selected:",
-    options: [
-      { label: "Home page", value: "page" },
-      { label: "Sitemap", value: "sitemap" },
-      { label: "Exit", value: "exit" },
-    ],
-  });
+  const message = 'Select an option:';
+  const options = [
+    { label: "Home page", value: "page" },
+    { label: "Sitemap", value: "sitemap" },
+    { label: "Exit", value: "exit" },
+  ];
+  const sl = new Select(options, message);
+  const choice = sl.selectOne();
 
   if (choice.includes("exit")) {
     console.log(chalk.red("Exiting..."));
