@@ -32,7 +32,7 @@ async function main() {
     for (const option of menu_options) {
       const seo = new SeoHandler(all.seo);
       const images = new ImageHandler(all.images);
-      const links = new LinksHandler(all.links);
+      const links = new LinksHandler(all.links, all.ids);
       const ids = new IdHandler(all.ids);
 
       switch (option) {
@@ -50,6 +50,9 @@ async function main() {
           break;
         case "links_hash":
           links.withHash();
+          break;
+        case"links_broken_hash":
+          links.brokenHash();
           break;
         case "ids_duplicates":
           ids.duplicates();
