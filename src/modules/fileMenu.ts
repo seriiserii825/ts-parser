@@ -17,8 +17,7 @@ export default async function fileMenu(): Promise<string | undefined> {
       { label: "Clear", value: "clear" },
       { label: "Exit", value: "exit" },
     ];
-    const sl = new Select(options, message);
-    const action = sl.selectOne();
+    const action = Select.selectOne(message, options);
 
     try {
       if (action === "list") await UrlsManager.list();

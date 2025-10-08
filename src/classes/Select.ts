@@ -1,46 +1,42 @@
 import { execSync } from "node:child_process";
-import { TOption } from "../types/TOption.js";
 import chalk from "chalk";
-export default class Select {
-  private options: TOption[];
-  private message: string;
-  constructor(options: TOption[], message: string) {
-    this.options = options;
-    this.message = message;
-  }
+import { TOption } from "../types/TOption.js";
 
-  selectOne(): string {
-    const values = this.options
+export default class Select {
+  static selectOne(message: string, options: TOption[]): string {
+    const values = options
       .map((opt) => opt.value)
       .filter((v): v is string => typeof v === "string" && !/^Symbol\(/.test(v));
 
     const input = values.join("\n");
-    console.log(chalk.blue(this.message));
+    console.log(chalk.blue(message));
 
-    const choice = execSync(
-      `fzf --no-clear --height=10 --reverse`,
-      { encoding: "utf8", stdio: ["pipe", "pipe", "inherit"], input }, // pass items via stdin
-    ).trim();
+    const choice = execSync(`fzf --no-clear --height=10 --reverse`, {
+      encoding: "utf8",
+      stdio: ["pipe", "pipe", "inherit"],
+      input,
+    }).trim();
 
     return choice;
   }
 
-  selectMultiple(): string[] {
-    const values = this.options
+  static selectMultiple(message: string, options: TOption[]): string[] {
+    const values = options
       .map((opt) => opt.value)
       .filter((v): v is string => typeof v === "string" && !/^Symbol\(/.test(v));
 
     const input = values.join("\n");
-    console.log(chalk.blue(this.message));
+    console.log(chalk.blue(message));
 
     try {
-      return execSync(`fzf --multi --no-clear --height=10 --reverse --prompt='Select> '`, {
+      const output = execSync(`fzf --multi --no-clear --height=10 --reverse --prompt='Select> '`, {
         encoding: "utf8",
         stdio: ["pipe", "pipe", "inherit"],
         input,
       })
         .trim()
         .split("\n");
+      return output;
     } catch {
       return [];
     }

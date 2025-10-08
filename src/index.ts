@@ -19,8 +19,7 @@ async function main() {
     { label: "Sitemap", value: "sitemap" },
     { label: "Exit", value: "exit" },
   ];
-  const sl = new Select(options, message);
-  const choice = sl.selectOne();
+  const choice = Select.selectOne(message, options);
 
   if (choice.includes("exit")) {
     console.log(chalk.red("Exiting..."));
