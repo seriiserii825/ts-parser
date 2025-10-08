@@ -1,2 +1,1 @@
 http://bs-csm-servizi.local/
-Symbol(clack:cancel)

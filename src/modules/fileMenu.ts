@@ -1,7 +1,7 @@
 import chalk from "chalk";
-import chalkSelect from "../utils/chalkSelect.js";
 import UrlsManager from "./getDomain.js";
 import { TOption } from "../types/TOption.js";
+import Select from "../classes/Select.js";
 
 export default async function fileMenu(): Promise<string | undefined> {
   await UrlsManager.ensureUrlsFile();
@@ -17,7 +17,8 @@ export default async function fileMenu(): Promise<string | undefined> {
       { label: "Clear", value: "clear" },
       { label: "Exit", value: "exit" },
     ];
-    const action = await chalkSelect({ message, options });
+    const sl = new Select(options, message);
+    const action = sl.selectOne();
 
     try {
       if (action === "list") await UrlsManager.list();
