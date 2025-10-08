@@ -5,6 +5,7 @@ import fileMenu from "./modules/fileMenu.js";
 import mainMenu from "./menus/mainMenu.js";
 import xmlMenu from "./menus/xmlMenu.js";
 import Select from "./classes/Select.js";
+import {TOption} from "./types/TOption.js";
 
 async function main() {
   const url = await fileMenu();
@@ -18,7 +19,8 @@ async function main() {
     { label: "Home page", value: "page" },
     { label: "Sitemap", value: "sitemap" },
     { label: "Exit", value: "exit" },
-  ];
+  ] as const satisfies readonly TOption[];
+
   const choice = Select.selectOne(message, options);
 
   if (choice.includes("exit")) {

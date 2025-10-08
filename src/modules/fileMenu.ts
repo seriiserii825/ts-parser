@@ -8,7 +8,7 @@ export default async function fileMenu(): Promise<string | undefined> {
 
   while (true) {
     const message = "File Menu: choose an action";
-    const options: TOption[] = [
+    const options = [
       { label: "1.Select", value: "select" },
       { label: "2.View", value: "list" },
       { label: "3.Add", value: "add" },
@@ -16,7 +16,7 @@ export default async function fileMenu(): Promise<string | undefined> {
       { label: "5.Delete", value: "remove" },
       { label: "6.Clear", value: "clear" },
       { label: "7.Exit", value: "exit" },
-    ] as const;
+    ] as const satisfies readonly TOption[];
 
     const action = Select.selectOne(message, options); // ✅ action is the union
 

@@ -1,9 +1,16 @@
+// Select.ts
 import { execSync } from "node:child_process";
 import chalk from "chalk";
-import {TOption} from "../types/TOption.js";
 
+type AnyOpt = { label: string; value: string };
+
+// T is a readonly array/tuple of options.
+// The return type is the union of all option .value's.
 export default class Select {
-  static selectOne(message: string, options: TOption[]): string {
+  static selectOne<T extends readonly AnyOpt[]>(
+    message: string,
+    options: T
+  ): T[number]["value"] {
     const labels = options.map((o) => o.label);
 
     console.log(chalk.blue(message));
@@ -20,34 +27,35 @@ export default class Select {
 
     const hit = options.find((o) => o.label === choice);
     if (!hit) throw new Error(`Choice "${choice}" not found`);
-    return hit.value;
+    return hit.value as T[number]["value"];
   }
 
-  // Return the values of all picked options (strongly typed)
-  static selectMultiple(
+  static selectMultiple<T extends readonly AnyOpt[]>(
     message: string,
-    options: TOption[]
-  ) {
+    options: T
+  ): Array<T[number]["value"]> {
     const labels = options.map((o) => o.label);
 
     console.log(chalk.blue(message));
     try {
-      const output = execSync(`fzf --multi --no-clear --height=10 --reverse --prompt='Select> '`, {
-        encoding: "utf8",
-        stdio: ["pipe", "pipe", "inherit"],
-        input: labels.join("\n"),
-      })
+      const output = execSync(
+        `fzf --multi --no-clear --height=10 --reverse --prompt='Select> '`,
+        {
+          encoding: "utf8",
+          stdio: ["pipe", "pipe", "inherit"],
+          input: labels.join("\n"),
+        }
+      )
         .trim()
         .split("\n")
         .filter(Boolean);
 
-      // Map chosen labels back to their values
-      const picked = options.filter((o) => output.includes(o.label)).map((o) => o.value);
+      const picked = options
+        .filter((o) => output.includes(o.label))
+        .map((o) => o.value) as Array<T[number]["value"]>;
 
-      // If user hit ENTER with no selection, fzf echoes the current line or empty; normalize to []
       return picked;
     } catch {
-      // ESC / cancel
       return [];
     }
   }
