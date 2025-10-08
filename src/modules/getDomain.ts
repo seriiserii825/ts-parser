@@ -1,5 +1,6 @@
 // src/utils/UrlsManager.ts
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import fs from "fs-extra";
 import chalk from "chalk";
 import pkg from "enquirer";
@@ -9,6 +10,9 @@ import chalkMultiSelect from "../utils/chalkMultiSelect.js";
 import chalkInput from "../utils/chalkInput.js";
 import ClipboardManager from "../utils/clipboardManager.js";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const { prompt } = pkg;
 
 export default class UrlsManager {
@@ -16,7 +20,8 @@ export default class UrlsManager {
 
   // ---------- Helpers ----------
   private static getUrlsPath(): string {
-    return path.resolve(process.cwd(), UrlsManager.FILE_NAME);
+    // return path.resolve(process.cwd(), UrlsManager.FILE_NAME);
+    return path.resolve(__dirname, UrlsManager.FILE_NAME);
   }
 
   static async ensureUrlsFile(): Promise<string> {
@@ -41,11 +46,7 @@ export default class UrlsManager {
   private static async writeUrls(urls: string[]): Promise<string[]> {
     const filePath = await UrlsManager.ensureUrlsFile();
     const unique = Array.from(new Set(urls.map((s) => s.trim()))).filter(Boolean);
-    await fs.writeFile(
-      filePath,
-      unique.join("\n") + (unique.length ? "\n" : ""),
-      "utf8"
-    );
+    await fs.writeFile(filePath, unique.join("\n") + (unique.length ? "\n" : ""), "utf8");
     return unique;
   }
 
@@ -96,8 +97,7 @@ export default class UrlsManager {
       message: "Enter url (y), or get from clipboard: ",
       placeholder: "",
       initialValue: "",
-      validate: (value) =>
-        value !== "y" && value !== "n" ? "Введите 'y' или 'n'" : "",
+      validate: (value) => (value !== "y" && value !== "n" ? "Введите 'y' или 'n'" : ""),
     });
 
     if (input === "y") {
@@ -116,9 +116,7 @@ export default class UrlsManager {
         placeholder: "https://example.com",
         initialValue: "http",
         validate: (value) =>
-          UrlsManager.isValidHTTPUrl(value)
-            ? ""
-            : "Required a valid http(s) URL",
+          UrlsManager.isValidHTTPUrl(value) ? "" : "Required a valid http(s) URL",
       });
       const urls = await UrlsManager.readUrls();
       urls.push(url.trim());
@@ -147,9 +145,7 @@ export default class UrlsManager {
       placeholder: oldVal,
       initialValue: oldVal,
       validate: (value) =>
-        UrlsManager.isValidHTTPUrl(value)
-          ? ""
-          : "Required a valid http(s) URL",
+        UrlsManager.isValidHTTPUrl(value) ? "" : "Required a valid http(s) URL",
     });
 
     urls[numberIndex] = updated.trim();
