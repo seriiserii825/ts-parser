@@ -92,9 +92,9 @@ export default class UrlsManager {
 
   static async add(): Promise<void> {
     const clipboard = await ClipboardManager.read();
-    console.log(chalk.gray(`Clipboard content: ${clipboard || "<empty>"}`));
+    console.log(chalk.yellow("Clipboard content: "), chalk.gray(clipboard || "<empty>"));
     const input = await chalkInput({
-      message: "Enter url (y), or get from clipboard: ",
+      message: "Enter (y) to paste url from clipboard, or insert manually: ",
       placeholder: "",
       initialValue: "",
       validate: (value) => (value !== "y" && value !== "n" ? "Введите 'y' или 'n'" : ""),
