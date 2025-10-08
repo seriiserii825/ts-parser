@@ -3,9 +3,7 @@
 import chalk from "chalk";
 import fileMenu from "./modules/fileMenu.js";
 import mainMenu from "./menus/mainMenu.js";
-import xmlMenu from "./menus/xmlMenu.js";
-import Select from "./classes/Select.js";
-import {TOption} from "./types/TOption.js";
+import {TMainMenuValues} from "./types/TMainMenuValues.js";
 
 async function main() {
   const url = await fileMenu();
@@ -14,25 +12,7 @@ async function main() {
     return;
   }
 
-  const message = 'Select an option:';
-  const options = [
-    { label: "Home page", value: "page" },
-    { label: "Sitemap", value: "sitemap" },
-    { label: "Exit", value: "exit" },
-  ] as const satisfies readonly TOption[];
-
-  const choice = Select.selectOne(message, options);
-
-  if (choice.includes("exit")) {
-    console.log(chalk.red("Exiting..."));
-    return;
-  }
-  if (choice.includes("page")) {
-    await mainMenu([url]);
-  }
-  if (choice.includes("sitemap")) {
-    await xmlMenu(url);
-  }
+  const menu_options = await mainMenu() as TMainMenuValues[];
 }
 
 main();

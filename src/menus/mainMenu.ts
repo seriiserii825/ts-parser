@@ -1,76 +1,19 @@
-import { isCancel, select } from "@clack/prompts";
-import { TSeoSubMenu } from "../data/seo_sub_menu_data.js";
-import getMenuSection from "./getMenuSection.js";
-import { TPage } from "../types/TPage.js";
-import getPages from "./getPages.js";
-import getSeoSubMenu from "./getSeoSubMenu.js";
-import getImagesSubMenu from "./getImagesSubMenu.js";
-import imageMenu from "./imageMenu.js";
-import getLinksSubmenu from "./getLinksSubmenu.js";
-import getIdsSubMenu, {TIdsSubMenu} from "./getIdsSubmenu.js";
+import Select from "../classes/Select.js";
+import {TMainMenuValues} from "../types/TMainMenuValues.js";
+import { TOption } from "../types/TOption.js";
 
-export default async function mainMenu(urls: string[]): Promise<void> {
-  while (true) {
-    const section = await getMenuSection();
-    if (isCancel(section) || section === "exit") return;
+export default async function mainMenu(): Promise<TMainMenuValues[]> {
+  const message = "Select an option:";
+  const menu_options = [
+    { label: "1.Seo all", value: "seo_all" },
+    { label: "2.Seo missing", value: "seo_missing" },
+    { label: "3.Images alt missing", value: "missing_alt" },
+    { label: "4.Links empty", value: "links_empty" },
+    { label: "5.Links hash", value: "links_hash" },
+    { label: "6.Links broken hash", value: "links_broken_hash" },
+    { label: "7.Ids duplicates", value: "ids_duplicates" },
+    { label: "8.Exit", value: "exit" },
+  ] as const satisfies readonly TOption[];
 
-    const pages: TPage[] = await getPages(urls, section);
-
-    const menu_choices: {
-      seo?: TSeoSubMenu[];
-      images?: string[];
-      links?: string[];
-      ids?: TIdsSubMenu[];
-    } = {};
-
-    if (section === "seo") {
-      menu_choices.seo = await getSeoSubMenu();
-    }
-
-    if (section === "images") {
-      menu_choices.images = await getImagesSubMenu();
-    }
-
-    if (section === "links") {
-      menu_choices.links = await getLinksSubmenu();
-    }
-
-    if (section === "ids") {
-      menu_choices.ids = await getIdsSubMenu();
-    }
-
-    for (const page of pages) {
-      if (section === "seo" && page.seo && menu_choices.seo) {
-        const seoMenu = await import("./seoMenu.js");
-        const res = await seoMenu.default(page, menu_choices.seo);
-        if (res === "exit") return;
-      }
-
-      if (section === "images" && page.images && menu_choices.images) {
-        const res = await imageMenu(page, menu_choices.images);
-        if (res === "exit") return;
-      }
-      if (section === "links" && page.links && menu_choices.links) {
-        const linksMenu = await import("./linksMenu.js");
-        const res = await linksMenu.default(page, menu_choices.links);
-        if (res === "exit") return;
-      }
-      if (section === "ids" && page.ids && menu_choices.ids) {
-        const idsMenu = await import("./idsMenu.js");
-        const res = await idsMenu.default(page, menu_choices.ids);
-        if (res === "exit") return;
-      }
-    }
-
-    // после прохода по всем ссылкам предложим выбрать следующее действие
-    const again = (await select({
-      message: "Run another action for ALL URLs?",
-      options: [
-        { label: "Yes", value: "again" },
-        { label: "Exit", value: "exit" },
-      ] as const,
-    })) as "again" | "exit" | symbol;
-
-    if (isCancel(again) || again === "exit") return;
-  }
+  return Select.selectMultiple(message, menu_options);
 }
