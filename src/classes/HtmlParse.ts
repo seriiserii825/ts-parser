@@ -168,26 +168,22 @@ export default class HtmlParse {
     const $ = this._$!;
     const results: TLinkInfo[] = [];
 
-    $("a[href]").each((_, el) => {
+    $("a").each((_, el) => {
       const $a = $(el);
-      let abs = UrlHelper.toAbsolute($a.attr("href"), this.baseUrl);
-      if (!abs) {
-        abs = "";
-      }
+      const rawHref = $a.attr("href"); // не трогаем
+      const href = rawHref?.trim() ?? ""; // "" если пустой, undefined -> ""
+      const abs = UrlHelper.toAbsolute(rawHref, this.baseUrl) ?? "";
 
       const rel = $a.attr("rel")?.trim() || undefined;
       const target = $a.attr("target")?.trim() || undefined;
       const text = $a.text().replace(/\s+/g, " ").trim();
 
-      const href = $a.attr("href")?.trim() || "";
-
       let external = false;
       try {
-        external = new URL(abs).origin !== new URL(this.baseUrl).origin;
+        if (abs) external = new URL(abs).origin !== new URL(this.baseUrl).origin;
       } catch {}
 
       const nofollow = /\bnofollow\b/i.test(rel || "");
-
       const parent_class = this.findNearestParentClass($a) || "";
 
       results.push({ url: abs, href, text, rel, target, external, nofollow, parent_class });

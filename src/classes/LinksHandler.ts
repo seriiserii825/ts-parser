@@ -26,9 +26,13 @@ export class LinksHandler {
   }
 
   public empty() {
-    const filtered = this.links.filter((link) => !link.url || link.url.trim() === "");
+    const filtered = this.links.filter((l) => {
+      const h = (l.href ?? "").trim();
+      return h === "" || h === "#";
+    });
     if (filtered.length === 0) return;
-    this.showTitle("Links with empty alt attribute:");
+
+    this.showTitle("Links with empty or # href:");
     this.drawHtml(filtered);
   }
   public withHash() {
@@ -72,7 +76,7 @@ export class LinksHandler {
       const rel = link.rel ? ` rel="${link.rel}"` : "";
       const target = link.target ? ` target="${link.target}"` : "";
       const link_html = `parent class: ${link.parent_class} -
-      <a href="${link.url}" ${rel} ${target}>${link.text}</a>`;
+      <a href="${link.href}" ${rel} ${target}>${link.text}</a>`;
       console.log(link_html);
     }
   }
