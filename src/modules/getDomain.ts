@@ -91,7 +91,10 @@ export default class UrlsManager {
   }
 
   static async add(): Promise<void> {
-    const clipboard = await ClipboardManager.read();
+    let clipboard = await ClipboardManager.read();
+    if (clipboard.endsWith("/")) {
+      clipboard = clipboard.slice(0, -1);
+    }
     console.log(chalk.yellow("Clipboard content: "), chalk.gray(clipboard || "<empty>"));
     const input = await chalkInput({
       message: "Enter (y) to paste url from clipboard, or insert manually: ",

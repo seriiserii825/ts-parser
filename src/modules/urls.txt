@@ -1,2 +1,4 @@
-https://csm.altuofianco.com/
-http://lc-confagricolturaveneto.local/
+https://confagricolturaveneto.bludelego.it/
+https://confagricolturaveneto.bludelego.it/new/
+https://confagricolturaveneto.bludelego.it/test/
+https://confagricolturaveneto.bludelego.it/test/some
