@@ -4,6 +4,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { TImageInfo, TLinkInfo, TSeoInfo } from "../types/THtmlResponse.js";
 import { UrlHelper } from "../utils/UrlHelper.js";
+import { TLorem } from "../types/TLorem.js";
 
 type ParseOpts = {
   timeoutMs?: number;
@@ -241,20 +242,122 @@ export default class HtmlParse {
     return results;
   }
 
+  async getLoremIpsum(): Promise<TLorem[]> {
+    await this.fetchOnce();
+    const $ = this._$!;
+    const matches: TLorem[] = [];
+
+    // 50 common Lorem Ipsum words
+    const LOREM_WORDS = new Set([
+      "lorem",
+      "ipsum",
+      "dolor",
+      "sit",
+      "amet",
+      "consectetur",
+      "adipiscing",
+      "elit",
+      "sed",
+      "do",
+      "eiusmod",
+      "tempor",
+      "incididunt",
+      "ut",
+      "labore",
+      "et",
+      "dolore",
+      "magna",
+      "aliqua",
+      "enim",
+      "ad",
+      "minim",
+      "veniam",
+      "quis",
+      "nostrud",
+      "exercitation",
+      "ullamco",
+      "laboris",
+      "nisi",
+      "aliquip",
+      "ex",
+      "ea",
+      "commodo",
+      "consequat",
+      "duis",
+      "aute",
+      "irure",
+      "dolor",
+      "in",
+      "reprehenderit",
+      "voluptate",
+      "velit",
+      "esse",
+      "cillum",
+      "fugiat",
+      "nulla",
+      "pariatur",
+      "excepteur",
+      "sint",
+      "occaecat",
+      "cupidatat",
+      "non",
+      "proident",
+      "sunt",
+      "culpa",
+      "qui",
+      "officia",
+      "deserunt",
+      "mollit",
+      "anim",
+      "id",
+      "est",
+      "laborum",
+    ]);
+
+    $("p, div, span, li").each((_, el) => {
+      const $el = $(el);
+      // Skip parents that contain other relevant tags
+      if ($el.find("p, div, span, li").length > 0) return;
+
+      const text = $el
+        .contents()
+        .filter((_, node) => node.type === "text")
+        .text()
+        .trim();
+
+      if (!text) return;
+
+      const words = text.match(/[A-Za-zÀ-ÖØ-öø-ÿ]+/g)?.map((w) => w.toLowerCase()) ?? [];
+      const longWords = words.filter((w) => w.length > 4);
+      const loremCount = longWords.filter((w) => LOREM_WORDS.has(w)).length;
+
+      if (loremCount >= 3) {
+        matches.push({
+          element: this.getTagClassOrParentClass($el),
+          words: text,
+        });
+      }
+    });
+
+    return matches;
+  }
+
   async getAll(): Promise<{
     seo: TSeoInfo;
     links: TLinkInfo[];
     images: TImageInfo[];
     ids: string[];
+    lorem: TLorem[];
   }> {
     await this.fetchOnce();
-    const [seo, links, images, ids] = await Promise.all([
+    const [seo, links, images, ids, lorem] = await Promise.all([
       this.getSeo(),
       this.getAllLinks(),
       this.getAllImages(),
       this.getAllIds(),
+      this.getLoremIpsum(),
     ]);
-    return { seo, links, images, ids };
+    return { seo, links, images, ids, lorem };
   }
 
   private findNearestParentClass($el: cheerio.Cheerio<cheerio.Element>): string | null {
@@ -265,5 +368,20 @@ export default class HtmlParse {
       $p = $p.parent();
     }
     return null;
+  }
+
+  private getTagClassOrParentClass($el: cheerio.Cheerio<cheerio.Element>): string {
+    const tag = $el.prop("tagName")?.toLowerCase() || "unknown";
+    const class_name = $el.attr("class")?.trim() || "";
+    const parentClass = this.findNearestParentClass($el) || "";
+    let full_name = "";
+    if (tag && class_name) {
+      full_name = `tag: ${tag}.${class_name.replace(/\s+/g, ".")}`;
+    } else if (tag) {
+      full_name = `parent_class: ${parentClass} tag: ${tag}`;
+    } else {
+      full_name = `parent_class: ${parentClass}`;
+    }
+    return full_name;
   }
 }
