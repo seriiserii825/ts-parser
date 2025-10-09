@@ -9,7 +9,6 @@ export class LoremIpsum {
 
   public all() {
     if (this.lorem.length === 0) {
-      console.log("No Lorem Ipsum found.");
       return;
     }
 
