@@ -76,4 +76,47 @@ export class LinksHandler {
       console.log(link_html);
     }
   }
+  public checkExternalLinks() {
+    // Keep only http(s) links that are external
+    const external_links = this.links.filter((link) => {
+      try {
+        const u = new URL(link.url);
+        const isHttp = u.protocol === "http:" || u.protocol === "https:";
+        if (!isHttp) return false;
+        // Reuse the flag you already compute in getAllLinks()
+        return link.external === true;
+        // Or compare origins without window:
+        // return u.origin !== new URL(this.baseUrl).origin;
+      } catch {
+        return false;
+      }
+    });
+
+    // target must be _blank
+    const links_without_target_blank = external_links.filter((link) => {
+      return (link.target ?? "").toLowerCase() !== "_blank";
+    });
+
+    // when target=_blank, rel must include both noreferrer and noopener
+    const links_without_safe_rel = external_links.filter((link) => {
+      if ((link.target ?? "").toLowerCase() !== "_blank") return false;
+      const rel = (link.rel ?? "").toLowerCase();
+      const hasNoRef = /\bnoreferrer\b/.test(rel);
+      const hasNoOp = /\bnoopener\b/.test(rel);
+      return !(hasNoRef && hasNoOp);
+    });
+
+    // union
+    const broken_links = [...links_without_target_blank, ...links_without_safe_rel];
+
+    if (broken_links.length === 0) {
+      console.log(
+        chalk.green("All external links have target='_blank' and rel='noreferrer noopener'.")
+      );
+      return;
+    }
+
+    this.showTitle("External links without target='_blank' and/or safe rel:");
+    this.drawHtml(broken_links);
+  }
 }

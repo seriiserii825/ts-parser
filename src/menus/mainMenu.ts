@@ -7,7 +7,7 @@ export default async function mainMenu(): Promise<string[]> {
     { label: "2.Seo missing", value: "seo_missing" },
     { label: "3.Images alt missing", value: "missing_alt" },
     { label: "4.Links empty", value: "links_empty" },
-    { label: "5.Links hash", value: "links_hash" },
+    { label: "5.Links external", value: "links_external" },
     { label: "6.Links broken hash", value: "links_broken_hash" },
     { label: "7.Ids duplicates", value: "ids_duplicates" },
     { label: "8.Exit", value: "exit" },

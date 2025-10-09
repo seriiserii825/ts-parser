@@ -48,8 +48,8 @@ async function main() {
         case "links_empty":
           links.empty();
           break;
-        case "links_hash":
-          links.withHash();
+        case "links_external":
+          links.checkExternalLinks();
           break;
         case"links_broken_hash":
           links.brokenHash();
