@@ -51,8 +51,11 @@ async function main() {
         case "links_external":
           links.checkExternalLinks();
           break;
-        case"links_broken_hash":
+        case "links_broken_hash":
           links.brokenHash();
+          break;
+        case "phone_whatsapp":
+          links.phoneWhatsapp();
           break;
         case "ids_duplicates":
           ids.duplicates();

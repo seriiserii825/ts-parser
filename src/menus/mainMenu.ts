@@ -9,8 +9,9 @@ export default async function mainMenu(): Promise<string[]> {
     { label: "4.Links empty", value: "links_empty" },
     { label: "5.Links external", value: "links_external" },
     { label: "6.Links broken hash", value: "links_broken_hash" },
-    { label: "7.Ids duplicates", value: "ids_duplicates" },
-    { label: "8.Exit", value: "exit" },
+    { label: "7.Phone whatsapp", value: "phone_whatsapp" },
+    { label: "8.Ids duplicates", value: "ids_duplicates" },
+    { label: "9.Exit", value: "exit" },
   ];
 
   return chalkMultiSelect({

@@ -123,4 +123,49 @@ export class LinksHandler {
     this.showTitle("External links without target='_blank' and/or safe rel:");
     this.drawHtml(broken_links);
   }
+
+  public phoneWhatsapp() {
+    this.whatsapp();
+    this.phone();
+  }
+
+  private phone() {
+    const phone_invalid_links = this.links.filter((link) => {
+      const href = (link.href ?? "").trim().toLowerCase();
+      if (!href.startsWith("tel:")) return false;
+
+      // Remove "tel:" prefix
+      const number = href.slice(4);
+
+      // valid if starts with +39 (Italy)
+      if (number.startsWith("+39")) return false;
+
+      // invalid if starts with 39 (no plus)
+      if (number.startsWith("39")) return true;
+
+      // any other prefix is OK
+      return false;
+    });
+
+    if (phone_invalid_links.length > 0) {
+      this.showTitle(chalk.red("Phone invalid links (should start with tel:+39)"));
+      this.drawHtml(phone_invalid_links);
+    }
+  }
+
+  private whatsapp() {
+    const whatsapp_invalid_links = this.links.filter((link) => {
+      const href = (link.href ?? "").toLowerCase();
+      const is_whatsapp_link = href.startsWith("https://wa.me");
+      if (is_whatsapp_link && link.href.indexOf("https://wa.me/39") === -1) {
+        return true;
+      }
+      return false;
+    });
+
+    if (whatsapp_invalid_links.length > 0) {
+      this.showTitle(chalk.red("WhatsApp invalid links (should start with https://wa.me/39)"));
+      this.drawHtml(whatsapp_invalid_links);
+    }
+  }
 }
