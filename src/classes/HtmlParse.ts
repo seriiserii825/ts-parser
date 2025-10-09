@@ -170,12 +170,16 @@ export default class HtmlParse {
 
     $("a[href]").each((_, el) => {
       const $a = $(el);
-      const abs = UrlHelper.toAbsolute($a.attr("href"), this.baseUrl);
-      if (!abs) return;
+      let abs = UrlHelper.toAbsolute($a.attr("href"), this.baseUrl);
+      if (!abs) {
+        abs = "";
+      }
 
       const rel = $a.attr("rel")?.trim() || undefined;
       const target = $a.attr("target")?.trim() || undefined;
       const text = $a.text().replace(/\s+/g, " ").trim();
+
+      const href = $a.attr("href")?.trim() || "";
 
       let external = false;
       try {
@@ -186,15 +190,10 @@ export default class HtmlParse {
 
       const parent_class = this.findNearestParentClass($a) || "";
 
-      results.push({ url: abs, text, rel, target, external, nofollow, parent_class });
+      results.push({ url: abs, href, text, rel, target, external, nofollow, parent_class });
     });
 
-    const seen = new Set<string>();
-    return results.filter((r) => {
-      if (seen.has(r.url)) return false;
-      seen.add(r.url);
-      return true;
-    });
+    return results;
   }
 
   async getAllImages(): Promise<TImageInfo[]> {

@@ -1,4 +1,3 @@
-- external links
 - empty links
 - phone whatsapp
 - have lorem

@@ -7,6 +7,7 @@ export type TSeoInfo = {
 
 export type TLinkInfo = {
   url: string;
+  href: string;
   text: string;
   rel?: string;
   target?: string;
