@@ -9,9 +9,13 @@ import { SeoHandler } from "./classes/SeoHandler.js";
 import { ImageHandler } from "./classes/ImageHandler.js";
 import { LinksHandler } from "./classes/LinksHandler.js";
 import { IdHandler } from "./classes/IdHandler.js";
-import {LoremIpsum} from "./classes/LoremIpsum.js";
+import { LoremIpsum } from "./classes/LoremIpsum.js";
+import UrlsManager from "./modules/getDomain.js";
 
 async function main() {
+  await UrlsManager.ensureUrlsFile();
+  await UrlsManager.list();
+
   const url = await fileMenu();
   if (url === "Exit") {
     console.log(chalk.blue("Exiting..."));
@@ -39,7 +43,7 @@ async function main() {
       const images = new ImageHandler(all.images);
       const links = new LinksHandler(all.links, all.ids);
       const ids = new IdHandler(all.ids);
-      const lorem = new LoremIpsum(all.lorem)
+      const lorem = new LoremIpsum(all.lorem);
 
       switch (option) {
         case "seo_all":

@@ -9,6 +9,8 @@ import chalkSelect from "../utils/chalkSelect.js";
 import chalkMultiSelect from "../utils/chalkMultiSelect.js";
 import chalkInput from "../utils/chalkInput.js";
 import ClipboardManager from "../utils/clipboardManager.js";
+import { TOption } from "../types/TOption.js";
+import Select from "../classes/Select.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,7 +43,6 @@ export default class UrlsManager {
       .split(/\r?\n/)
       .map((s) => s.trim())
       .filter(Boolean);
-    urls.push("Exit");
     return urls;
   }
 
@@ -81,15 +82,15 @@ export default class UrlsManager {
       console.log(chalk.yellow("Empty file. Add the first URL."));
       return "";
     }
-    console.log(chalk.cyan(`\nContent ${UrlsManager.FILE_NAME}:`));
-    urls.forEach((u, i) => {
-      console.log(chalk.gray(String(i + 1).padStart(2, " ")), u);
-    });
-    const index = await chalkSelect({
-      message: "Choose a URL",
-      options: urls.map((u, i) => ({ label: u, value: String(i) })),
-    });
-    return urls[Number(index)];
+
+    const message = "Choose an action: ";
+    const options = [
+      ...urls.map((u, i) => ({ label: `${i+1}.${u}`, value: u })),
+      { label: "Exit", value: "Exit" },
+    ] as const satisfies readonly TOption[];
+
+    const action = Select.selectOne(message, options); // ✅ action is the union
+    return action;
   }
 
   static async add(): Promise<void> {

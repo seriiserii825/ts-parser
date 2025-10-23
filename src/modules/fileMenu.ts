@@ -4,8 +4,6 @@ import { TOption } from "../types/TOption.js";
 import Select from "../classes/Select.js";
 
 export default async function fileMenu(): Promise<string | undefined> {
-  await UrlsManager.ensureUrlsFile();
-
   while (true) {
     const message = "File Menu: choose an action";
     const options = [
