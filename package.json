@@ -5,7 +5,7 @@
   "type": "module",
   "bin": {
     "urls": "./dist/index.js",
-    "urls-dev": "./bin/urls-dev.mjs"
+    "ts_parser": "./bin/urls-dev.mjs"
   },
   "scripts": {
     "dev": "tsx watch src/index.ts",

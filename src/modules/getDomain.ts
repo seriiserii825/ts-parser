@@ -37,10 +37,12 @@ export default class UrlsManager {
   private static async readUrls(): Promise<string[]> {
     const filePath = await UrlsManager.ensureUrlsFile();
     const raw = await fs.readFile(filePath, "utf8");
-    return raw
+    const urls = raw
       .split(/\r?\n/)
       .map((s) => s.trim())
       .filter(Boolean);
+    urls.push("Exit");
+    return urls;
   }
 
   private static async writeUrls(urls: string[]): Promise<string[]> {

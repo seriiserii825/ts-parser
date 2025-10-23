@@ -13,6 +13,10 @@ import {LoremIpsum} from "./classes/LoremIpsum.js";
 
 async function main() {
   const url = await fileMenu();
+  if (url === "Exit") {
+    console.log(chalk.blue("Exiting..."));
+    return;
+  }
   if (!url) {
     console.log(chalk.red("No URL selected. Exiting..."));
     return;
