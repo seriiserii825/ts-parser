@@ -11,8 +11,10 @@ import { LinksHandler } from "./classes/LinksHandler.js";
 import { IdHandler } from "./classes/IdHandler.js";
 import { LoremIpsum } from "./classes/LoremIpsum.js";
 import UrlsManager from "./modules/getDomain.js";
+import isDownloadDir from "./modules/isDownloadDir.js";
 
 async function main() {
+  isDownloadDir();
   await UrlsManager.ensureUrlsFile();
   await UrlsManager.list();
 
