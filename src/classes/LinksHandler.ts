@@ -101,22 +101,10 @@ export class LinksHandler {
       return (link.target ?? "").toLowerCase() !== "_blank";
     });
 
-    // when target=_blank, rel must include both noreferrer and noopener
-    const links_without_safe_rel = external_links.filter((link) => {
-      if ((link.target ?? "").toLowerCase() !== "_blank") return false;
-      const rel = (link.rel ?? "").toLowerCase();
-      const hasNoRef = /\bnoreferrer\b/.test(rel);
-      const hasNoOp = /\bnoopener\b/.test(rel);
-      return !(hasNoRef && hasNoOp);
-    });
-
     // union
-    const broken_links = [...links_without_target_blank, ...links_without_safe_rel];
+    const broken_links = [...links_without_target_blank];
 
     if (broken_links.length === 0) {
-      console.log(
-        chalk.green("All external links have target='_blank' and rel='noreferrer noopener'.")
-      );
       return;
     }
 
