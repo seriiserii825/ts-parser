@@ -50,11 +50,9 @@ export class LinksHandler {
   public brokenHash() {
     const links_with_hash = this._getWithHash();
     if (!links_with_hash) {
-      console.log(chalk.red("No links with hash found."));
       return;
     }
     if (this.ids.length === 0) {
-      console.log(chalk.red("No ids found to compare."));
       return;
     }
     const broken_links = links_with_hash.filter((link) => {
@@ -64,7 +62,6 @@ export class LinksHandler {
       return !this.ids.includes(hash);
     });
     if (broken_links.length === 0) {
-      console.log(chalk.green("No broken hash links found."));
       return;
     }
     this.showTitle(chalk.red("Links with broken hash:"));
