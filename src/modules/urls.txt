@@ -7,3 +7,4 @@ http://lc-bcm-meccanica.local
 http://lc-scuola-sci-sestriere.local
 http://lc-omp.local
 http://lc-checcini-christian.local
+http://lc-virmec.local
